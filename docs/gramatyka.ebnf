@@ -1,107 +1,107 @@
 // część składniowa
 
-program					= { function_declaration }
+program			= { function_declaration }
 function_declaration	= "function", ( type_variable | "void" ) identifier function_params statement_block
-function_params			= "(" [ type_variable identifier { "," type_variable identifier } ] ")"
+function_params		= "(" [ type_variable identifier { "," type_variable identifier } ] ")"
 
-statement_block			= "{" { statements } "}"
-statements				= { single_statement semicolon_sign }
+statement_block		= "{" { statements } "}"
+statements		= { single_statement semicolon_sign }
 
-single_statement 		= for_loop 
-						| if_statement
-						| return_statement
-						| function_call
-						| init_statement
-						| init_container
-						| assignment
+single_statement 	= for_loop 
+			| if_statement
+			| return_statement
+			| function_call
+			| init_statement
+			| init_container
+			| assignment
 
-function_call			= identifier arguments
-if_statement			= "if" "(" expression ")" statement_block [ "else" statement_block ]
-for_loop				= "for" "(" type_variable identifier "in" identifier ")" statement_block
-for_loop_sorted			= "for" "(" type_variable identifier "in" identifier "," "key" "=" identifier ")"
+function_call		= identifier arguments
+if_statement		= "if" "(" expression ")" statement_block [ "else" statement_block ]
+for_loop		= "for" "(" type_variable identifier "in" identifier ")" statement_block
+for_loop_sorted		= "for" "(" type_variable identifier "in" identifier "," "key" "=" identifier ")"
 
 parameters              = type_variable identifier {"," type_variable identifier} 
 
-linq_query				= "from" type_variable identifier "in" identifier
-			    		  "where" expression
-			    		  "select" select_options
+linq_query		= "from" type_variable identifier "in" identifier
+			  "where" expression
+			  "select" select_options
 
-select_options			= identifier
-						| function_call
+select_options		= identifier
+			| function_call
 
-return_statement		= "return" expression ";"
-init_container			= type_container identifier ["=" "new" type_container "(" container_starter ")"]
-init_statement			= type_basic identifier ["=" expression]
-arguments				= "(" [ expression { "," expression } ] ")" semicolon_sign
-assignable				= expression
+return_statement	= "return" expression ";"
+init_container		= type_container identifier ["=" "new" type_container "(" container_starter ")"]
+init_statement		= type_basic identifier ["=" expression]
+arguments		= "(" [ expression { "," expression } ] ")" semicolon_sign
+assignable		= expression
 
-assignment 				= (identifier, "=", expression)
+assignment 		= (identifier, "=", expression)
 
-container_starter		= "" 
-						| container_inside
-container_inside		= list_inside 
-						| pair_inside
-						| dict_inside
-list_inside				= "[" text | number | container_inside {"," text | number | container_inside } "]"
-pair_inside				= "[" text | number | container_inside "," text | number | container_inside  "]"
-dict_inside				= "{" {  text | number | container_inside ":" text | number | container_inside  } "}"
+container_starter	= "" 
+			| container_inside
+container_inside	= list_inside 
+			| pair_inside
+			| dict_inside
+list_inside		= "[" text | number | container_inside {"," text | number | container_inside } "]"
+pair_inside		= "[" text | number | container_inside "," text | number | container_inside  "]"
+dict_inside		= "{" {  text | number | container_inside ":" text | number | container_inside  } "}"
 
-expression 				= and_expression {or_sign expression}
-and_expression 			= relation_expression {and_sign and_expression}
+expression 		= and_expression {or_sign expression}
+and_expression 		= relation_expression {and_sign and_expression}
 relation_expression 	= sum_expression [relation_expression sum_expression]
-sum_expression 			= multiply_expression additive_sign sum_expression
+sum_expression 		= multiply_expression additive_sign sum_expression
 multiply_expression 	= factor [multiplicative_sign multiply_expression]
 
-factor 					= identifier 
-						| function_call
-						| constant 
-constant 				= var_values
-identifier				= letter { letter | digit }
+factor 			= identifier 
+			| function_call
+			| constant 
+constant 		= var_values
+identifier		= letter { letter | digit }
 
 
 
 // część leksykalna
 
-type_variable			= type_basic
-						| type_container
+type_variable		= type_basic
+			| type_container
 
-type_basic				= "int"
-						| "float"
-						| "string"
-						| "bool"
+type_basic		= "int"
+			| "float"
+			| "string"
+			| "bool"
 
-type_container			= "List" "<" type_variable ">"
-						| "Pair" "<" type_variable "," type_variable  ">"
-						| "Dict""<" type_variable "," type_variable  ">"
+type_container		= "List" "<" type_variable ">"
+			| "Pair" "<" type_variable "," type_variable  ">"
+			| "Dict""<" type_variable "," type_variable  ">"
 
-or_sign					= "or"
-and_sign				= "and"
-relation_sign			= "<" | "<=" | ">" | ">=" | "==" | "!="
-additive_sign			= "+" | "-"
-multiplicative_sign		= "*" | "/" | "%"
-negation_sign			= "!"
+or_sign			= "or"
+and_sign		= "and"
+relation_sign		= "<" | "<=" | ">" | ">=" | "==" | "!="
+additive_sign		= "+" | "-"
+multiplicative_sign	= "*" | "/" | "%"
+negation_sign		= "!"
 
-var_values				= bool_value | decimal_value | string_value
-bool_value				= true | false
-decimal_value			= number
-string_value			= text
+var_values		= bool_value | decimal_value | string_value
+bool_value		= true | false
+decimal_value		= number
+string_value		= text
 
-true					= "true"
-false					= "false"
+true			= "true"
+false			= "false"
 
-text					= " { letter | number | white_space | nextline_sign | tab_sign } "
-white_space				= " "
-letter					= lowercase_letter | uppercase_letter
-lowercase_letter		= 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z'
-uppercase_letter		= 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z'
+text			= " { letter | number | white_space | nextline_sign | tab_sign } "
+white_space		= " "
+letter			= lowercase_letter | uppercase_letter
+lowercase_letter	= 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z'
+uppercase_letter	= 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z'
 
-nexline_sign			= backslash_sign "n"
-tab_sign				= backslash_sign "t"
+nexline_sign		= backslash_sign "n"
+tab_sign		= backslash_sign "t"
 
-number					= '0' | ['-'] non_zero_digit { digit } ['.' digit { digit } ]
-digit 					= '0' | non_zero_digit
-non_zero_digit 			= '1' | '2' | '3' | '4' | '5' | '6'| '7' | '8' | '9'
+number			= '0' | ['-'] non_zero_digit { digit } ['.' digit { digit } ]
+digit 			= '0' | non_zero_digit
+non_zero_digit 		= '1' | '2' | '3' | '4' | '5' | '6'| '7' | '8' | '9'
 
-semicolon_sign			= ";"
-backslash_sign			= "/"
-comment_start			= "//"
+semicolon_sign		= ";"
+backslash_sign		= "/"
+comment_start		= "//"
