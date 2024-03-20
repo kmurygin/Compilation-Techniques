@@ -1,3 +1,5 @@
+// część składniowa
+
 program					= { function_declaration }
 function_declaration	= "function", ( type_variable | "void" ) identifier function_params statement_block
 function_params			= "(" [ type_variable identifier { "," type_variable identifier } ] ")"
@@ -41,8 +43,8 @@ container_inside		= list_inside
 						| pair_inside
 						| dict_inside
 list_inside				= "[" text | number | container_inside {"," text | number | container_inside } "]"
-pair_inside				= "[" text | number | container_inside , text | number | container_inside  "]"
-dict_inside				= "{" { text | number | container_inside ":" text | number | container_inside  } "}"
+pair_inside				= "[" text | number | container_inside "," text | number | container_inside  "]"
+dict_inside				= "{" {  text | number | container_inside ":" text | number | container_inside  } "}"
 
 expression 				= and_expression {or_sign expression}
 and_expression 			= relation_expression {and_sign and_expression}
@@ -55,6 +57,10 @@ factor 					= identifier
 						| constant 
 constant 				= var_values
 identifier				= letter { letter | digit }
+
+
+
+// część leksykalna
 
 type_variable			= type_basic
 						| type_container
