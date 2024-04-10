@@ -9,7 +9,7 @@ def test_read_from_file():
 
         characters, positions = get_characters_and_positions(reader)
         assert characters == ['1', '0', '+', '1', '1', '=', '2', '1', '\n', 'EOF']
-        assert positions == [(0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6), (0, 7), (0, 8), (0, 9), (2, 0)]
+        assert positions == [(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (3, 0)]
 
 
 def test_read_from_file_empty():
@@ -18,7 +18,7 @@ def test_read_from_file_empty():
 
         characters, positions = get_characters_and_positions(reader)
         assert characters == ["EOF"]
-        assert positions == [(1, 0)]
+        assert positions == [(2, 0)]
 
 
 def test_read_from_string():
@@ -28,8 +28,9 @@ def test_read_from_string():
     characters, positions = get_characters_and_positions(reader)
     assert characters == ['1', '0', '+', '1', '1', '=', '2', '1', '\n', 'k', 'a', 'c', 'p', 'e', 'r', '\n', 'm', 'a',
                           'j', 'a', 'EOF']
-    assert positions == [(0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6), (0, 7), (0, 8), (0, 9), (1, 0), (1, 1), (1, 2),
-                         (1, 3), (1, 4), (1, 5), (1, 6), (2, 0), (2, 1), (2, 2), (2, 3), (3, 0)]
+    assert positions == [(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7),
+                         (1, 8), (1, 9), (2, 1), (2, 2), (2, 3), (2, 4), (2, 5),
+                         (2, 6), (2, 7), (3, 1), (3, 2), (3, 3), (3, 4), (4, 0)]
 
 
 def test_read_from_string_empty():
@@ -38,7 +39,7 @@ def test_read_from_string_empty():
 
     characters, positions = get_characters_and_positions(reader)
     assert characters == ["EOF"]
-    assert positions == [(1, 0)]
+    assert positions == [(2, 0)]
 
 
 def get_characters_and_positions(src):
