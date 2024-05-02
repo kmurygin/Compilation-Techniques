@@ -126,10 +126,9 @@ class Lexer:
             text_comment = text_comment + character
             self.get_next_char()
             character = self.get_char()
-
+            if len(text_comment) > STRING_LIMIT_CHARS:
+                raise lexer_exception.CommentTooLongException("Comment too long", self.current_position)
         self.get_next_char()
-        if len(text_comment) > STRING_LIMIT_CHARS:
-            raise lexer_exception.CommentTooLongException("Comment too long", self.current_position)
         token = Token(TokenType.COMMENT, text_comment, self.current_position)
         return token
 
@@ -231,15 +230,14 @@ class Lexer:
             text += character
             self.get_next_char()
             character = self.get_char()
-
+            if len(text) > ID_LIMIT_CHARS:
+                raise lexer_exception.IdentifierTooLongException("Identifier too long", self.current_position)
         if text == "":
             return None
         elif text in ("true", "false"):
             return Token(TokenType.BOOL_VALUE, text, self.current_position)
         elif text in self.token_dictionary.keys():
             return Token(self.token_dictionary[text], text, self.current_position)
-        if len(text) > ID_LIMIT_CHARS:
-            raise lexer_exception.IdentifierTooLongException("Identifier too long", self.current_position)
         return Token(TokenType.ID, text, self.current_position)
 
     def skip_whitespace(self):

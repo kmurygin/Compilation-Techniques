@@ -2,7 +2,6 @@ import io
 import pytest
 
 from src.exceptions.lexer_exception import (
-    LexerException,
     CommentTooLongException,
     StringTooLongException,
     UnclosedStringException,
