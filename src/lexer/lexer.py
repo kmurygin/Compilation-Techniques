@@ -103,13 +103,13 @@ class Lexer:
         character = self.get_char()
         if character in self.token_dictionary_sign.keys():
             self.get_next_char()
-            return Token(self.token_dictionary_sign[character], "", self.current_position)
+            return Token(self.token_dictionary_sign[character], None, self.current_position)
         else:
             return None
 
     def try_build_eof(self):
         if self.get_char() == 'EOF':
-            return Token(TokenType.EOF, "", self.current_position)
+            return Token(TokenType.EOF, None, self.current_position)
         return None
 
     def try_build_comment(self):
@@ -137,16 +137,16 @@ class Lexer:
         character = self.get_char()
         if character in self.token_dictionary_operators_one_char.keys():
             self.get_next_char()
-            return Token(self.token_dictionary_operators_one_char[character], "", self.current_position)
+            return Token(self.token_dictionary_operators_one_char[character], None, self.current_position)
         if character in ['<', '>', '=', '!']:
             operator += character
             self.get_next_char()
             character = self.get_char()
             if not character == "=":
-                return Token(self.token_dictionary_operators[operator], "", self.current_position)
+                return Token(self.token_dictionary_operators[operator], None, self.current_position)
             elif character == "=":
                 operator += character
-                return Token(self.token_dictionary_operators[operator], "", self.current_position)
+                return Token(self.token_dictionary_operators[operator], None, self.current_position)
         if character in ['|','&']:
             token = self.build_logical_operator(character)
             if token:
@@ -160,7 +160,7 @@ class Lexer:
         character = self.get_char()
         if character == operator:
             operator += character
-            return Token(self.token_dictionary_operators[operator], "", self.current_position)
+            return Token(self.token_dictionary_operators[operator], None, self.current_position)
         return None
 
     def try_build_number(self):
