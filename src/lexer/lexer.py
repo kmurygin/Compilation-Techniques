@@ -28,6 +28,22 @@ class Lexer:
             "string": TokenType.STRING_KEYWORD,
             "bool": TokenType.BOOL_KEYWORD,
 
+            "length": TokenType.LENGTH,
+            "delete": TokenType.DELETE,
+            "get": TokenType.GET,
+            "type": TokenType.TYPE,
+            "contains": TokenType.CONTAINS,
+            "SELECT": TokenType.SELECT,
+            "WHERE": TokenType.WHERE,
+            "FROM": TokenType.FROM,
+            "at": TokenType.AT,
+            "append": TokenType.APPEND,
+            "remove": TokenType.REMOVE,
+            "first": TokenType.FIRST,
+            "second": TokenType.SECOND,
+
+            "print": TokenType.PRINT,
+
             "function": TokenType.FUNCTION,
             "for": TokenType.FOR,
             "while": TokenType.WHILE,
@@ -47,9 +63,12 @@ class Lexer:
             ")": TokenType.RIGHT_BRACKET,
             "{": TokenType.LEFT_CURLY_BRACKET,
             "}": TokenType.RIGHT_CURLY_BRACKET,
-
+            "[": TokenType.LEFT_SQUARE_BRACKET,
+            "]": TokenType.RIGHT_SQUARE_BRACKET,
             ",": TokenType.COMMA,
+            ".": TokenType.DOT,
             ";": TokenType.SEMICOLON,
+            ":": TokenType.COLON
         }
 
         self.token_dictionary_operators = {
@@ -137,16 +156,16 @@ class Lexer:
         character = self.get_char()
         if character in self.token_dictionary_operators_one_char.keys():
             self.get_next_char()
-            return Token(self.token_dictionary_operators_one_char[character], None, self.current_position)
+            return Token(self.token_dictionary_operators_one_char[character], operator, self.current_position)
         if character in ['<', '>', '=', '!']:
             operator += character
             self.get_next_char()
             character = self.get_char()
             if not character == "=":
-                return Token(self.token_dictionary_operators[operator], None, self.current_position)
+                return Token(self.token_dictionary_operators[operator], operator, self.current_position)
             elif character == "=":
                 operator += character
-                return Token(self.token_dictionary_operators[operator], None, self.current_position)
+                return Token(self.token_dictionary_operators[operator], operator, self.current_position)
         if character in ['|','&']:
             token = self.build_logical_operator(character)
             if token:
