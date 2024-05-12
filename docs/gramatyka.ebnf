@@ -20,7 +20,7 @@ function_call		= identifier arguments
 method_call		= identifier "." identifier "(" parameters ")"
 if_statement		= "if" "(" expression ")" statement_block [ "else" statement_block ]
 for_loop		= "for" "(" type_variable identifier "in" identifier ")" statement_block
-for_loop_sorted		= "for" "(" type_variable identifier "in" identifier "," "key" "=" identifier ")"
+for_loop_sorted		= "for" "(" type_variable identifier "in" identifier "," "key" "=" identifier ")" statement_block
 
 parameters              = type_variable identifier {"," type_variable identifier} 
 
