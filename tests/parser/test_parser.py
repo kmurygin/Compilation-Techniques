@@ -104,20 +104,6 @@ def test_parse_pair():
     assert parser.parse_pair() == Pair(StringValue("rok"), IntValue(2024))
 
 
-# def test_pair_linq_query():
-#     parser = create_parser("FROM int age IN dict WHERE age<10 SELECT age.first ORDERBY age")
-#
-#     from_part = ["int", Identifier("age"), Identifier("dict")]
-#     where_part = 0
-#
-#     assert parser.parse_linq() == 10
-#
-#
-# def test_parse_if():
-#     parser = create_parser("if(i>10){i=i+10;}else{i=i/10;}")
-#     assert parser.parse_if() == 10
-
-
 def test_parse_for():
     parser = create_parser("for(int i in numbers){int a = 10;}")
 
@@ -138,3 +124,21 @@ def test_parse_program():
     assert parser.parse() == [function]
 
 
+def test_parse_add_expression():
+    parser = create_parser(
+        "1+2"
+    )
+    literal_1 = IntValue(1)
+    literal_2 = IntValue(2)
+
+    assert parser.parse_sum_expression() == AddExpression(literal_1, literal_2)
+
+
+def test_parse_subtract_expression():
+    parser = create_parser(
+        "1-2"
+    )
+    literal_1 = IntValue(1)
+    literal_2 = IntValue(2)
+
+    assert parser.parse_sum_expression() == SubExpression(literal_1, literal_2, 1, 2)

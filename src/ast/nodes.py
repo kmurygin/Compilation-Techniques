@@ -12,12 +12,41 @@ class Program(Node):
 
     def __eq__(self, other):
         return (
-            isinstance(other, Program)
-            and self.program_body == other.program_body
+                isinstance(other, Program)
+                and self.program_body == other.program_body
         )
 
     def __repr__(self):
         return f"[Program: {self.program_body}]"
+
+class StatementBlock(Node):
+    def __init__(self, statements, line=None, column=None):
+        super().__init__()
+        self.statements = statements
+
+    def __eq__(self, other):
+        return (
+                isinstance(other, StatementBlock) and
+                self.statements == other.statements
+        )
+
+    def __repr__(self):
+        return f"[StatementBlock: {self.statements}]"
+
+
+class SingleStatement(Node):
+    def __init__(self, statement, line=None, column=None):
+        super().__init__()
+        self.statement = statement
+
+    def __eq__(self, other):
+        return (
+                isinstance(other, SingleStatement) and
+                self.statement == other.statement
+        )
+
+    def __repr__(self):
+        return f"[SingleStatement: {self.statement}]"
 
 
 class Variable(Node):
@@ -146,9 +175,9 @@ class Pair(Node):
 
     def __eq__(self, other):
         return (
-            isinstance(other, Pair) and
-            self.value_1 == other.value_1 and
-            self.value_2 == other.value_2
+                isinstance(other, Pair) and
+                self.value_1 == other.value_1 and
+                self.value_2 == other.value_2
         )
 
     def __repr__(self):
@@ -162,8 +191,8 @@ class Dict(Node):
 
     def __eq__(self, other):
         return (
-            isinstance(other, Dict) and
-            other.pairs == self.pairs
+                isinstance(other, Dict) and
+                other.pairs == self.pairs
         )
 
     def __repr__(self):
@@ -197,9 +226,9 @@ class FunctionBody(Node):
 
     def __eq__(self, other):
         return (
-            isinstance(other, FunctionBody) and
-            other.content == self.content and
-            other.return_statement == self.return_statement
+                isinstance(other, FunctionBody) and
+                other.content == self.content and
+                other.return_statement == self.return_statement
         )
 
     def __repr__(self):
@@ -229,11 +258,11 @@ class Function(Node):
 
     def __eq__(self, other):
         return (
-            isinstance(other, Function) and
-            self.type == other.type and
-            self.identifier == other.identifier and
-            self.arguments == other.arguments and
-            self.body == other.body
+                isinstance(other, Function) and
+                self.type == other.type and
+                self.identifier == other.identifier and
+                self.arguments == other.arguments and
+                self.body == other.body
         )
 
     def __repr__(self):
@@ -266,8 +295,8 @@ class Body(Node):
 
     def __eq__(self, other):
         return (
-            isinstance(other, Body) and
-            other.content == self.content
+                isinstance(other, Body) and
+                other.content == self.content
         )
 
     def __repr__(self):
@@ -325,12 +354,233 @@ class LINQ(Node):
 
     def __eq__(self, other):
         return (
-            isinstance(other, LINQ) and
-            other.from_statement == self.from_statement and
-            other.where_statement == self.where_statement and
-            other.select_statement == self.select_statement and
-            other.orderby_statement == self.orderby_statement
+                isinstance(other, LINQ) and
+                other.from_statement == self.from_statement and
+                other.where_statement == self.where_statement and
+                other.select_statement == self.select_statement and
+                other.orderby_statement == self.orderby_statement
         )
 
     def __repr__(self):
         return f"[LINQ: {self.from_statement} {self.where_statement} {self.select_statement} {self.orderby_statement}]"
+
+
+class AndExpression(Node):
+    def __init__(self, left_term, right_term, line=None, column=None):
+        super().__init__(line, column)
+        self.left = left_term
+        self.right = right_term
+
+    def __repr__(self):
+        return f"[AndExpression {self.line} {self.column} ({self.left}, {self.right})"
+
+    def __eq__(self, other):
+        return (
+                isinstance(other, AndExpression) and
+                other.left == self.left and
+                other.right == self.right
+        )
+
+
+class RelationExpression(Node):
+    def __init__(self, left_term, right_term, line=None, column=None):
+        super().__init__(line, column)
+        self.left = left_term
+        self.right = right_term
+
+    def __repr__(self):
+        return f"[RelationExpression {self.line} {self.column} ({self.left}, {self.right})"
+
+    def __eq__(self, other):
+        return (
+                isinstance(other, RelationExpression) and
+                other.left == self.left and
+                other.right == self.right
+        )
+
+
+class OrExpression(Node):
+    def __init__(self, left_term, right_term, line=None, column=None):
+        super().__init__(line, column)
+        self.left = left_term
+        self.right = right_term
+
+    def __repr__(self):
+        return f"[OrExpression {self.line} {self.column} ({self.left}, {self.right})"
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, OrExpression) and
+            other.left == self.left and
+            other.right == self.right
+        )
+
+
+class AddExpression(Node):
+    def __init__(self, left_term, right_term, line=None, column=None):
+        super().__init__(line, column)
+        self.left = left_term
+        self.right = right_term
+
+    def __repr__(self):
+        return f"[AddExpression {self.line} {self.column} ({self.left}, {self.right})"
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, AddExpression) and
+            other.left == self.left and
+            other.right == self.right
+        )
+
+
+class SubExpression(Node):
+    def __init__(self, left_term, right_term, line=None, column=None):
+        super().__init__(line, column)
+        self.left = left_term
+        self.right = right_term
+
+    def __repr__(self):
+        return f"[SubExpression ({self.left}, {self.right}) {self.line} {self.column} "
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, SubExpression) and
+            other.left == self.left and
+            other.right == self.right
+        )
+
+
+class MultiplyExpression(Node):
+    def __init__(self, left_term, right_term, line=None, column=None):
+        super().__init__(line, column)
+        self.left = left_term
+        self.right = right_term
+
+    def __repr__(self):
+        return f"[SumExpression {self.line} {self.column} ({self.left}, {self.right})"
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, SumExpression) and
+            other.left == self.left and
+            other.right == self.right
+        )
+
+
+class DivisionExpression(Node):
+    def __init__(self, left_term, right_term, line=None, column=None):
+        super().__init__(line, column)
+        self.left = left_term
+        self.right = right_term
+
+    def __repr__(self):
+        return f"[DivisionExpression {self.line} {self.column} ({self.left}, {self.right})"
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, DivisionExpression) and
+            other.left == self.left and
+            other.right == self.right
+        )
+
+
+class LessThanExpression(Node):
+    def __init__(self, left_term, right_term, line=None, column=None):
+        super().__init__(line, column)
+        self.left = left_term
+        self.right = right_term
+
+    def __repr__(self):
+        return f"[LessThanExpression {self.line} {self.column}]"
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, LessThanExpression) and
+            other.left == self.left and
+            other.right == self.right
+        )
+
+
+class LessThanOrEqualExpression(Node):
+    def __init__(self, left_term, right_term, line=None, column=None):
+        super().__init__(line, column)
+        self.left = left_term
+        self.right = right_term
+
+    def __repr__(self):
+        return f"[LessThanOrEqualExpression {self.line} {self.column}]"
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, LessThanOrEqualExpression) and
+            other.left == self.left and
+            other.right == self.right
+        )
+
+
+class GreaterThanExpression(Node):
+    def __init__(self, left_term, right_term, line=None, column=None):
+        super().__init__(line, column)
+        self.left = left_term
+        self.right = right_term
+
+    def __repr__(self):
+        return f"[GreaterThanExpression {self.line} {self.column}]"
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, GreaterThanExpression) and
+            other.left == self.left and
+            other.right == self.right
+        )
+
+
+class GreaterThanOrEqualExpression(Node):
+    def __init__(self, left_term, right_term, line=None, column=None):
+        super().__init__(line, column)
+        self.left = left_term
+        self.right = right_term
+
+    def __repr__(self):
+        return f"[GreaterThanOrEqualExpression {self.line} {self.column}]"
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, GreaterThanOrEqualExpression) and
+            other.left == self.left and
+            other.right == self.right
+        )
+
+
+class EqualExpression(Node):
+    def __init__(self, left_term, right_term, line=None, column=None):
+        super().__init__(line, column)
+        self.left = left_term
+        self.right = right_term
+
+    def __repr__(self):
+        return f"[EqualExpression {self.line} {self.column}]"
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, EqualExpression) and
+            other.left == self.left and
+            other.right == self.right
+        )
+
+
+class NotEqualExpression(Node):
+    def __init__(self, left_term, right_term, line=None, column=None):
+        super().__init__(line, column)
+        self.left = left_term
+        self.right = right_term
+
+    def __repr__(self):
+        return f"[NotEqualExpression {self.line} {self.column}]"
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, NotEqualExpression) and
+            other.left == self.left and
+            other.right == self.right
+        )
