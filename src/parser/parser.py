@@ -37,46 +37,74 @@ class Parser:
     def parse(self):
         program = Program()
         while self.current_token.get_type() != TokenType.EOF:
-            function = self.parse_function()
+            function = self.parse_function_declaration()
             program.add_function(function)
         return program
 
-    def parse_function(self) -> Function:
+    def parse_function_declaration(self) -> Function:
         line, column = self.current_token.get_position()
         self.require_and_consume(TokenType.FUNCTION)
-        type = self.parse_type()
+        function_type = self.parse_type()
+        identifier = self.parse_identifier()
+        self.require_and_consume(TokenType.LEFT_BRACKET)
+        params = self.parse_function_params()
+        self.require_and_consume(TokenType.RIGHT_BRACKET)
+        self.require_and_consume(TokenType.LEFT_CURLY_BRACKET)
+        body = self.parse_statement_block()
+        self.require_and_consume(TokenType.RIGHT_CURLY_BRACKET)
+        return Function(function_type, identifier, params, body, line, column)
+
+    def parse_function_params(self):
+        line, column = self.current_token.get_position()
+        params = []
+        while self.current_token.get_type() in VARIABLE_TYPES:
+            variable_type = self.parse_type()
+            variable_name = self.parse_identifier()
+            params.append((variable_type, variable_name))
+            if self.current_token.get_type() == TokenType.COMMA:
+                self.consume()
+        return params
+
+    def parse_function_call(self):
+        line, column = self.current_token.get_position()
         identifier = self.parse_identifier()
         self.require_and_consume(TokenType.LEFT_BRACKET)
         arguments = self.parse_arguments()
         self.require_and_consume(TokenType.RIGHT_BRACKET)
+        return FunctionCall(identifier, arguments, line, column)
+
+    def parse_arguments(self):
+        line, column = self.current_token.get_position()
+        arguments = []
+        while self.current_token.get_type() != TokenType.LEFT_BRACKET:
+            argument = self.parse_expression()
+            self.require_and_consume(TokenType.COMMA)
+        return arguments
+
+    def parse_statement_block(self):
+        statements = []
+        line, column = self.current_token.get_position()
         self.require_and_consume(TokenType.LEFT_CURLY_BRACKET)
-        body = self.parse_function_body()
-        self.require_and_consume(TokenType.RIGHT_CURLY_BRACKET)
-        return Function(type, identifier, arguments, body, line, column)
-
-    def parse_function_body(self) -> FunctionBody:
-        line, column = self.current_token.get_position()
-        content = self.parse_function_body_content()
-        return_statement = self.parse_function_body_return()
-        return FunctionBody(content, return_statement, line, column)
-
-    def parse_function_body_content(self):
-        if self.current_token.get_type() not in [TokenType.RETURN, TokenType.RIGHT_CURLY_BRACKET]:
-            return self.parse_content()
-        return []
-
-    def parse_function_body_return(self):
-        if self.current_token.get_type() == TokenType.RETURN:
-            return_statement = self.parse_return()
+        while self.current_token.get_type() != TokenType.RIGHT_CURLY_BRACKET:
+            statements.append(self.parse_single_statement())
             self.require_and_consume(TokenType.SEMICOLON)
-            return return_statement
+        self.require_and_consume(TokenType.RIGHT_CURLY_BRACKET)
+        return StatementBlock(statements, line, column)
 
-    def parse_function_call(self, function_identifier):
+    def parse_single_statement(self):
         line, column = self.current_token.get_position()
-        self.require_and_consume(TokenType.LEFT_BRACKET)
-        arguments = self.parse_elements(TokenType.RIGHT_BRACKET)
-        self.require_and_consume(TokenType.RIGHT_BRACKET)
-        return FunctionCall(function_identifier, arguments, line, column)
+        if self.current_token.get_type() == TokenType.FOR:
+            self.parse_for()
+        elif self.current_token.get_type() == TokenType.IF:
+            self.parse_if()
+        elif self.current_token.get_type() == TokenType.WHILE:
+            self.parse_while()
+        elif self.current_token.get_type() == TokenType.RETURN:
+            self.parse_return()
+        elif self.current_token.get_type() == TokenType.ID:
+            self.parse_function_call()
+            # self.parse_method_call()
+            # self.parse_assignment()
 
     def parse_elements(self, stop_type):
         elements = []
@@ -95,18 +123,6 @@ class Parser:
     def parse_return(self):
         self.require_and_consume(TokenType.RETURN)
         return self.parse_expression()
-
-    def parse_arguments(self):
-        line, column = self.current_token.get_position()
-        arguments = []
-        if self.current_token.get_type() != TokenType.RIGHT_BRACKET:
-            while self.current_token.get_type() in VARIABLE_TYPES:
-                variable_type = self.parse_type()
-                variable_name = self.parse_identifier()
-                arguments.append(Variable(variable_type, variable_name, None, line, column))
-                if self.current_token.get_type() == TokenType.COMMA:
-                    self.consume()
-        return arguments
 
     def parse_content(self):
         end_of_content_token_types = [TokenType.RETURN, TokenType.RIGHT_CURLY_BRACKET]
