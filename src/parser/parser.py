@@ -294,60 +294,6 @@ class Parser:
         elif self.check_token_type(TokenType.TYPE):
             return self.parse_operation_type(tmp_list)
 
-    def parse_operation_remove(self, tmp_list):
-        line, column = self.current_token.get_position()
-        self.require_and_consume(TokenType.DELETE)
-        self.require_and_consume(TokenType.LEFT_BRACKET)
-
-        argument = self.parse_expression()
-
-        self.require_and_consume(TokenType.RIGHT_BRACKET)
-        return Remove(tmp_list, argument, line, column)
-
-    def parse_operation_length(self, tmp_list):
-        line, column = self.current_token.get_position()
-        self.require_and_consume(TokenType.LENGTH)
-        self.require_and_consume(TokenType.LEFT_BRACKET)
-        self.require_and_consume(TokenType.RIGHT_BRACKET)
-        return Length(tmp_list, line, column)
-
-    def parse_operation_type(self, tmp_list):
-        line, column = self.current_token.get_position()
-        self.require_and_consume(TokenType.TYPE)
-        self.require_and_consume(TokenType.LEFT_BRACKET)
-        self.require_and_consume(TokenType.RIGHT_BRACKET)
-        return Type(tmp_list, line, column)
-
-    def parse_operation_append(self, tmp_list):
-        line, column = self.current_token.get_position()
-        self.require_and_consume(TokenType.DELETE)
-        self.require_and_consume(TokenType.LEFT_BRACKET)
-
-        argument = self.parse_expression()
-
-        self.require_and_consume(TokenType.RIGHT_BRACKET)
-        return Append(tmp_list, argument, line, column)
-
-    def parse_operation_at(self, tmp_list):
-        line, column = self.current_token.get_position()
-        self.require_and_consume(TokenType.DELETE)
-        self.require_and_consume(TokenType.LEFT_BRACKET)
-
-        argument = self.parse_expression()
-
-        self.require_and_consume(TokenType.RIGHT_BRACKET)
-        return At(tmp_list, argument, line, column)
-
-    def parse_operation_get(self, dict):
-        line, column = self.current_token.get_position()
-        self.require_and_consume(TokenType.DELETE)
-        self.require_and_consume(TokenType.LEFT_BRACKET)
-
-        argument = self.parse_expression()
-
-        self.require_and_consume(TokenType.RIGHT_BRACKET)
-        return Append(dict, argument, line, column)
-
     def parse_linq(self):
         line, column = self.current_token.get_position()
         self.require_and_consume(TokenType.FROM)
