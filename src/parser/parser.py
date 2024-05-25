@@ -35,10 +35,10 @@ class Parser:
         # raise SyntaxError(token_type)
 
     def parse(self):
-        program = []
+        program = Program()
         while self.current_token.get_type() != TokenType.EOF:
             function = self.parse_function()
-            program.append(function)
+            program.add_function(function)
         return program
 
     def parse_function(self) -> Function:
@@ -119,69 +119,25 @@ class Parser:
         return lines
 
     def parse_expression(self):
-        line, column = self.current_token.get_position()
-        factor = self.parse_multiplication()
+        pass
 
-        if type(factor) == Identifier:
-            if self.check_token_type(TokenType.ASSIGN):
-                operator = self.consume().get_value()
-                new_factor = self.parse_expression()
-                return Expression(factor, operator, new_factor, line, column)
+    def parse_and_expression(self):
+        pass
 
-        for sign in RELATIONSHIP_TYPES:
-            if self.check_token_type(sign):
-                operator = self.consume().get_value()
-                new_factor = self.parse_expression()
-                return Expression(factor, operator, new_factor, line, column)
+    def parse_relation_expression(self):
+        pass
 
-        while self.check_token_type(TokenType.ADD_SIGN) or self.check_token_type(TokenType.SUB_SIGN):
-            operator = self.consume()
-            new_factor = self.parse_multiplication()
-            factor = Expression(factor, operator.get_value(), new_factor, line, column)
-        return factor
+    def parse_sum_expression(self):
+        pass
 
-    def parse_multiplication(self):
-        line, column = self.current_token.get_position()
-        factor = self.parse_factor()
-        while self.check_token_type(TokenType.MULTIPLY_SIGN) or self.check_token_type(TokenType.DIVIDE_SIGN):
-            operator = self.consume().get_value()
-            new_factor = self.parse_factor()
-            factor = Expression(factor, operator, new_factor, line, column)
-        return factor
+    def parse_multiply_expression(self):
+        pass
 
     def parse_factor(self):
-        if self.check_token_type(TokenType.LEFT_BRACKET):
-            self.require_and_consume(TokenType.LEFT_BRACKET)
-            factor = self.parse_expression()
-            self.require_and_consume(TokenType.LEFT_BRACKET)
-        else:
-            factor = self.parse_component()
-        return factor
+        pass
 
-    def parse_component(self):
-        if self.current_token.get_value() == "-":
-            line, column = self.current_token.get_position()
-            self.consume()
-            return_statement = self.parse_component_without_minus()
-            return Expression(IntValue(0), "-", return_statement, line, column)
-        else:
-            return self.parse_component_without_minus()
-
-    def parse_component_without_minus(self):
-        if self.check_token_type(TokenType.BOOL_VALUE):
-            return self.parse_bool()
-        elif self.check_token_type(TokenType.INT_VALUE):
-            return self.parse_int()
-        elif self.check_token_type(TokenType.FLOAT_VALUE):
-            return self.parse_float()
-        elif self.check_token_type(TokenType.STRING_VALUE):
-            return self.parse_string()
-        elif self.check_token_type(TokenType.ID):
-            identifier = self.parse_identifier()
-            if self.check_token_type(TokenType.LEFT_BRACKET):
-                return self.parse_function_call(identifier)
-            else:
-                return identifier
+    def parse_constant(self):
+        pass
 
     def parse_bool(self):
         token = self.require_and_consume(TokenType.BOOL_VALUE)
@@ -200,20 +156,12 @@ class Parser:
         return FloatValue(token.get_value(), token.get_line(), token.get_column())
 
     def parse_line(self):
-        if self.current_token.get_type() == TokenType.PRINT:
-            line = self.parse_print()
-        elif self.current_token.get_type() in VARIABLE_TYPES:
+        if self.current_token.get_type() in VARIABLE_TYPES:
             line = self.parse_declaration()
         else:
             line = self.parse_expression()
         self.require_and_consume(TokenType.SEMICOLON)
         return line
-
-    def parse_print(self):
-        line, column = self.current_token.get_position()
-        self.require_and_consume(TokenType.PRINT)
-        value = self.parse_expression()
-        return PrintFunction(value, line, column)
 
     def parse_declaration(self):
         line, column = self.current_token.get_position()
@@ -355,4 +303,12 @@ class Parser:
         return ForStatement(type, var, collection, content, line, column)
 
     def parse_while(self):
-        pass
+        line, column = self.current_token.get_position()
+        self.require_and_consume(TokenType.WHILE)
+        self.require_and_consume(TokenType.LEFT_BRACKET)
+        condition = self.parse_expression()
+        self.require_and_consume(TokenType.RIGHT_BRACKET)
+        self.require_and_consume(TokenType.LEFT_CURLY_BRACKET)
+        body = self.parse_content() # ??????????
+        self.require_and_consume(TokenType.RIGHT_CURLY_BRACKET)
+        return WhileStatement(condition, body, line, column)
