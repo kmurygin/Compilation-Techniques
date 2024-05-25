@@ -457,11 +457,11 @@ class MultiplyExpression(Node):
         self.right = right_term
 
     def __repr__(self):
-        return f"[SumExpression {self.line} {self.column} ({self.left}, {self.right})"
+        return f"[MultiplicationExpression {self.line} {self.column} ({self.left}, {self.right})"
 
     def __eq__(self, other):
         return (
-            isinstance(other, SumExpression) and
+            isinstance(other, MultiplyExpression) and
             other.left == self.left and
             other.right == self.right
         )

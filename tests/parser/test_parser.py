@@ -142,3 +142,23 @@ def test_parse_subtract_expression():
     literal_2 = IntValue(2)
 
     assert parser.parse_sum_expression() == SubExpression(literal_1, literal_2, 1, 2)
+
+
+def test_parse_multiply_expression():
+    parser = create_parser(
+        "1*2"
+    )
+    literal_1 = IntValue(1)
+    literal_2 = IntValue(2)
+
+    assert parser.parse_multiply_expression() == MultiplyExpression(literal_1, literal_2)
+
+
+def test_parse_divide_expression():
+    parser = create_parser(
+        "1/2"
+    )
+    literal_1 = IntValue(1)
+    literal_2 = IntValue(2)
+
+    assert parser.parse_multiply_expression() == DivisionExpression(literal_1, literal_2)
