@@ -1,6 +1,25 @@
 from .abstract_node import Node
 
 
+class Program(Node):
+    def __init__(self, program_body=None):
+        super().__init__()
+        if not program_body:
+            self.program_body = list()
+
+    def add_function(self, function):
+        self.program_body.append(function)
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, Program)
+            and self.program_body == other.program_body
+        )
+
+    def __repr__(self):
+        return f"[Program: {self.program_body}]"
+
+
 class Variable(Node):
     def __init__(self, variable_type, variable_identifier, value=None, line=None, column=None):
         super().__init__(line, column)
@@ -285,18 +304,6 @@ class WhileStatement(Node):
         self.body = body
 
 
-class PrintFunction(Node):
-    def __init__(self, value, line=None, column=None):
-        super().__init__(line, column)
-        self.value = value
-
-    def __eq__(self, other):
-        return (
-                isinstance(other, PrintFunction) and
-                self.value == other.value
-        )
-
-
 class CollectionOperation(Node):
     def __init__(self, source_list, line=None, column=None):
         super().__init__(line, column)
@@ -306,82 +313,6 @@ class CollectionOperation(Node):
 
     def __repr__(self):
         pass
-
-
-class At(CollectionOperation):
-    def __init__(self, source_list, idx, line=None, column=None):
-        super().__init__(source_list, line, column)
-        self.source_list = source_list
-        self.idx = idx
-        # self.line = line
-        # self.column = column
-
-    def __eq__(self, other):
-        return isinstance(other, At) and self.source_list == other.source_list and self.idx == other.idx
-
-    def __repr__(self):
-        return f"[Get: {self.source_list}, {self.idx}]"
-
-
-class Length(CollectionOperation):
-    def __init__(self, source_list, line=None, column=None):
-        super().__init__(source_list, line, column)
-        self.source_list = source_list
-        # self.line = line
-        # self.column = column
-
-    def __eq__(self, other):
-        return isinstance(other, Length) and self.source_list == other.source_list
-
-    def __repr__(self):
-        return f"[Length: {self.source_list}]"
-
-
-class Remove(CollectionOperation):
-    def __init__(self, source_list, idx, line=None, column=None):
-        super().__init__(source_list, line, column)
-        self.source_list = source_list
-        self.idx = idx
-        # self.line = line
-        # self.column = column
-
-    def __eq__(self, other):
-        return isinstance(other, Remove) and self.source_list == other.source_list and self.idx == other.idx
-
-    def __repr__(self):
-        return f"[Delete: {self.source_list}, {self.idx}]"
-
-
-class Type(CollectionOperation):
-    def __init__(self, source_list, line=None, column=None):
-        super().__init__(source_list, line, column)
-        self.source_list = source_list
-        # self.line = line
-        # self.column = column
-
-    def __eq__(self, other):
-        return isinstance(other, Type) and self.source_list == other.source_list
-
-    def __repr__(self):
-        return f"[Type: {self.source_list}]"
-
-
-class Append(CollectionOperation):
-    def __init__(self, source_list, idx, line=None, column=None):
-        super().__init__(source_list, line, column)
-        self.source_list = source_list
-        self.idx = idx
-        # self.line = line
-        # self.column = column
-
-    def __eq__(self, other):
-        return (isinstance(other, Append) and
-                self.source_list == other.source_list and
-                self.idx == other.idx
-                )
-
-    def __repr__(self):
-        return f"[Append: {self.source_list}, {self.idx}]"
 
 
 class LINQ(Node):
