@@ -162,3 +162,23 @@ def test_parse_divide_expression():
     literal_2 = IntValue(2)
 
     assert parser.parse_multiply_expression() == DivisionExpression(literal_1, literal_2)
+
+
+def test_parse_and_expression():
+    parser = create_parser(
+        "1 && 10"
+    )
+    literal_1 = IntValue(1)
+    literal_2 = IntValue(10)
+
+    assert parser.parse_and_expression() == AndExpression(literal_1, literal_2)
+
+
+def test_parse_or_expression():
+    parser = create_parser(
+        "1 || 10"
+    )
+    literal_1 = IntValue(1)
+    literal_2 = IntValue(10)
+
+    assert parser.parse_expression() == OrExpression(literal_1, literal_2)
