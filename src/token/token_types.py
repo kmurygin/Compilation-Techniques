@@ -31,8 +31,6 @@ class TokenType(Enum):
     FIRST = auto()
     SECOND = auto()
 
-    PRINT = auto()
-
     OR_SIGN = auto()
     AND_SIGN = auto()
     LESS_SIGN = auto()
@@ -62,6 +60,8 @@ class TokenType(Enum):
     IF = auto()
     ELSE = auto()
     RETURN = auto()
+
+    KEY = auto()
 
     FROM = auto()
     IN = auto()
