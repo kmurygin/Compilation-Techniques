@@ -6,6 +6,8 @@ class Program(Node):
         super().__init__()
         if not program_body:
             self.program_body = list()
+        else:
+            self.program_body = program_body
 
     def add_function(self, function):
         self.program_body.append(function)
@@ -47,27 +49,6 @@ class SingleStatement(Node):
 
     def __repr__(self):
         return f"[SingleStatement: {self.statement}]"
-
-
-class Variable(Node):
-    def __init__(self, variable_type, variable_identifier, value=None, line=None, column=None):
-        super().__init__(line, column)
-        self.type = variable_type
-        self.identifier = variable_identifier
-        self.value = value
-        # self.line = line
-        # self.column = column
-
-    def __eq__(self, other):
-        return (
-                isinstance(other, Variable) and
-                self.type == other.type and
-                self.identifier == other.identifier and
-                self.value == other.value
-        )
-
-    def __repr__(self):
-        return f"[Variable: {self.type} {self.identifier} {self.value}]"
 
 
 class BoolValue(Node):
@@ -145,60 +126,6 @@ class Identifier(Node):
         return f"[ID: {self.value}]"
 
 
-class List(Node):
-    def __init__(self, elements, line=None, column=None):
-        super().__init__(line, column)
-        # self.type = type
-        self.elements = elements
-
-    def __eq__(self, other):
-        return (
-                isinstance(other, List) and
-                self.elements == other.elements
-        )
-
-    def __repr__(self):
-        buff = f"[LIST:"
-        for element in self.elements:
-            buff += f" {element}"
-        buff += "]"
-        return buff
-
-
-class Pair(Node):
-    def __init__(self, value_1, value_2, line=None, column=None):
-        super().__init__(line, column)
-        # self.type_1 = type_1
-        # self.type_2 = type_2
-        self.value_1 = value_1
-        self.value_2 = value_2
-
-    def __eq__(self, other):
-        return (
-                isinstance(other, Pair) and
-                self.value_1 == other.value_1 and
-                self.value_2 == other.value_2
-        )
-
-    def __repr__(self):
-        return f"[Pair: {self.value_1}, {self.value_2}]"
-
-
-class Dict(Node):
-    def __init__(self, pairs, line=None, column=None):
-        super().__init__(line, column)
-        self.pairs = pairs
-
-    def __eq__(self, other):
-        return (
-                isinstance(other, Dict) and
-                other.pairs == self.pairs
-        )
-
-    def __repr__(self):
-        return f"[Dict: {self.pairs}]"
-
-
 class Expression(Node):
     def __init__(self, left_operand, operation, right_operand, line=None, column=None):
         super().__init__(line, column)
@@ -236,16 +163,39 @@ class FunctionBody(Node):
 
 
 class FunctionCall(Node):
-    def __init__(self, identifier, arguments, line, column):
+    def __init__(self, identifier, arguments, line=None, column=None):
         super().__init__(line, column)
         self.identifier = identifier
         self.arguments = arguments
 
     def __eq__(self, other):
         return (
-                isinstance(other,
-                           FunctionCall) and self.identifier == other.identifier and self.arguments == other.arguments
+            isinstance(other, FunctionCall) and
+            self.identifier == other.identifier and
+            self.arguments == other.arguments
         )
+
+    def __repr__(self):
+        return f"[FunctionCall: {self.identifier} {self.arguments}]"
+
+
+class MethodCall(Node):
+    def __init__(self, expression, method_identifier, arguments, line=None, column=None):
+        super().__init__(line, column)
+        self.expression = expression
+        self.method_identifier = method_identifier
+        self.arguments = arguments
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, MethodCall) and
+            self.expression == other.expression and
+            self.method_identifier == other.method_identifier and
+            self.arguments == other.arguments
+        )
+
+    def __repr__(self):
+        return f"[MethodCall: {self.expression} {self.method_identifier} {self.arguments}]"
 
 
 class Function(Node):
@@ -304,7 +254,28 @@ class Body(Node):
 
 
 class ForStatement(Node):
-    def __init__(self, type, identifier, collection, body, line=None, column=None, key_identifier=None):
+    def __init__(self, type, identifier, collection, body, line=None, column=None):
+        super().__init__(line, column)
+        self.type = type
+        self.identifier = identifier
+        self.collection = collection
+        self.body = body
+
+    def __eq__(self, other):
+        return (
+                isinstance(other, ForStatement) and
+                self.type == other.type and
+                self.identifier == other.identifier and
+                self.collection == other.collection and
+                self.body == other.body
+        )
+
+    def __repr__(self):
+        return f"[For: {self.type} {self.identifier} {self.collection} {self.body}]"
+
+
+class ForSortedStatement(Node):
+    def __init__(self, type, identifier, collection, key_identifier, body, line=None, column=None):
         super().__init__(line, column)
         self.type = type
         self.identifier = identifier
@@ -314,7 +285,7 @@ class ForStatement(Node):
 
     def __eq__(self, other):
         return (
-                isinstance(other, ForStatement) and
+                isinstance(other, ForSortedStatement) and
                 self.type == other.type and
                 self.identifier == other.identifier and
                 self.collection == other.collection and
@@ -323,7 +294,7 @@ class ForStatement(Node):
         )
 
     def __repr__(self):
-        return f"[For: {self.type} {self.identifier} {self.collection} {self.body} {self.key_identifier}]"
+        return f"[ForSorted: {self.type} {self.identifier} {self.collection} {self.key_identifier} {self.body}]"
 
 
 class WhileStatement(Node):
@@ -331,17 +302,6 @@ class WhileStatement(Node):
         super().__init__(line, column)
         self.condition = condition
         self.body = body
-
-
-class CollectionOperation(Node):
-    def __init__(self, source_list, line=None, column=None):
-        super().__init__(line, column)
-        self.source_list = source_list
-        # self.line = line
-        # self.column = column
-
-    def __repr__(self):
-        pass
 
 
 class LINQ(Node):
@@ -583,4 +543,183 @@ class NotEqualExpression(Node):
             isinstance(other, NotEqualExpression) and
             other.left == self.left and
             other.right == self.right
+        )
+
+
+class Assignment(Node):
+    def __init__(self, identifier, expression, line=None, column=None):
+        super().__init__(line, column)
+        self.identifier = identifier
+        self.expression = expression
+
+    def __repr__(self):
+        return f"[Assignment {self.identifier} {self.expression}]"
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, Assignment) and
+            other.identifier == self.identifier and
+            other.expression == self.expression
+        )
+
+
+class Arguments(Node):
+    def __init__(self, arguments, line=None, column=None):
+        super().__init__(line, column)
+        self.arguments = arguments
+
+    def __repr__(self):
+        return f"[Arguments {self.arguments}]"
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, Arguments) and
+            other.arguments == self.arguments
+        )
+
+
+class ReturnStatement(Node):
+    def __init__(self, expression, line=None, column=None):
+        super().__init__(line, column)
+        self.expression = expression
+
+    def __repr__(self):
+        return f"[ReturnStatement {self.expression}]"
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, ReturnStatement) and
+            other.expression == self.expression
+        )
+
+
+class InitStatement(Node):
+    def __init__(self, type, identifier, expression, line=None, column=None):
+        super().__init__(line, column)
+        self.type = type
+        self.identifier = identifier
+        self.expression = expression
+
+    def __repr__(self):
+        return f"[InitStatement {self.type} {self.identifier} {self.expression}]"
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, InitStatement) and
+            other.type == self.type and
+            other.identifier == self.identifier and
+            other.expression == self.expression
+        )
+
+
+class Declaration(Node):
+    def __init__(self, type, identifier, line=None, column=None):
+        super().__init__(line, column)
+        self.type = type
+        self.identifier = identifier
+
+    def __repr__(self):
+        return f"[Declaration {self.type} {self.identifier} ]"
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, InitStatement) and
+            other.type == self.type and
+            other.identifier == self.identifier
+        )
+
+
+class ListType(Node):
+    def __init__(self, type, line=None, column=None):
+        super().__init__(line, column)
+        self.type = type
+
+    def __repr__(self):
+        return f"[ListType {self.type}]"
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, ListType) and
+            other.type == self.type
+        )
+
+
+class PairType(Node):
+    def __init__(self, type_1, type_2, line=None, column=None):
+        super().__init__(line, column)
+        self.type_1 = type_1
+        self.type_2 = type_2
+
+    def __repr__(self):
+        return f"[PairType {self.type_1} {self.type_2}]"
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, PairType) and
+            other.type_1 == self.type_1 and
+            other.type_2 == self.type_2
+        )
+
+
+class DictType(Node):
+    def __init__(self, key_type, value_type, line=None, column=None):
+        super().__init__(line, column)
+        self.key_type = key_type
+        self.value_type = value_type
+
+    def __repr__(self):
+        return f"[DictType {self.key_type} {self.value_type}]"
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, DictType) and
+            other.key_type == self.key_type and
+            other.value_type == self.value_type
+        )
+
+
+class List(Node):
+    def __init__(self, elements, line=None, column=None):
+        super().__init__(line, column)
+        self.elements = elements
+
+    def __repr__(self):
+        return f"[List {self.elements}]"
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, List) and
+            other.elements == self.elements
+        )
+
+
+class Pair(Node):
+    def __init__(self, left, right, line=None, column=None):
+        super().__init__(line, column)
+        self.left = left
+        self.right = right
+
+    def __repr__(self):
+        return f"[Pair {self.left} {self.right}]"
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, Pair) and
+            other.left == self.left and
+            other.right == self.right
+        )
+
+
+class Dict(Node):
+    def __init__(self, pairs, line=None, column=None):
+        super().__init__(line, column)
+        self.pairs = pairs
+
+    def __repr__(self):
+        return f"[Dict {self.pairs}]"
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, Dict) and
+            other.pairs == self.pairs
         )
