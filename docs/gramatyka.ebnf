@@ -9,6 +9,7 @@ statements		= { single_statement semicolon_sign }
 
 single_statement 	= for_loop 
 			| if_statement
+			| while_loop
 			| return_statement
 			| function_call
 			| method_call
@@ -17,19 +18,20 @@ single_statement 	= for_loop
 			| assignment
 
 function_call		= identifier arguments
-method_call		= identifier "." identifier "(" parameters ")"
+method_call		= expression "." identifier "(" parameters ")"
 if_statement		= "if" "(" expression ")" statement_block [ "else" statement_block ]
 for_loop		= "for" "(" type_variable identifier "in" identifier ")" statement_block
-for_loop_sorted		= "for" "(" type_variable identifier "in" identifier "," "key" "=" identifier ")"
+for_loop_sorted		= "for" "(" type_variable identifier "in" identifier "," "key" "=" identifier ")" statement_block
 
 parameters              = type_variable identifier {"," type_variable identifier} 
 
 linq_query		= "from" type_variable identifier "in" identifier
 			  "where" expression
 			  "select" select_options
+			  "orderby" expression
 
 select_options		= identifier
-			| function_call
+			        | function_call
 
 return_statement	= "return" expression ";"
 init_container		= type_container identifier ["=" "new" type_container "(" container_starter ")"]
@@ -51,11 +53,12 @@ dict_inside		= "{" {  text | number | container_inside ":" text | number | conta
 expression 		= and_expression {or_sign expression}
 and_expression 		= relation_expression {and_sign and_expression}
 relation_expression 	= sum_expression [relation_expression sum_expression]
-sum_expression 		= multiply_expression additive_sign sum_expression
-multiply_expression 	= factor [multiplicative_sign multiply_expression]
+sum_expression 		= multiply_expression {additive_sign multiplicative_expression}
+multiply_expression 	= factor {multiplicative_sign factor}
 
 factor 			= identifier 
 			| function_call
+			| method_call
 			| constant 
 constant 		= var_values
 identifier		= letter { letter | digit }

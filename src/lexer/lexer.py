@@ -28,6 +28,15 @@ class Lexer:
             "string": TokenType.STRING_KEYWORD,
             "bool": TokenType.BOOL_KEYWORD,
 
+            # "SELECT": TokenType.SELECT,
+            # "WHERE": TokenType.WHERE,
+            # "FROM": TokenType.FROM,
+            # "at": TokenType.AT,
+            # "append": TokenType.APPEND,
+            # "remove": TokenType.REMOVE,
+            # "first": TokenType.FIRST,
+            # "second": TokenType.SECOND,
+
             "function": TokenType.FUNCTION,
             "for": TokenType.FOR,
             "while": TokenType.WHILE,
@@ -39,7 +48,9 @@ class Lexer:
             "where": TokenType.WHERE,
             "select": TokenType.SELECT,
             "orderby": TokenType.ORDER_BY,
-            "EOF": TokenType.EOF
+            "EOF": TokenType.EOF,
+
+            "key": TokenType.KEY,
         }
 
         self.token_dictionary_sign = {
@@ -47,9 +58,12 @@ class Lexer:
             ")": TokenType.RIGHT_BRACKET,
             "{": TokenType.LEFT_CURLY_BRACKET,
             "}": TokenType.RIGHT_CURLY_BRACKET,
-
+            "[": TokenType.LEFT_SQUARE_BRACKET,
+            "]": TokenType.RIGHT_SQUARE_BRACKET,
             ",": TokenType.COMMA,
+            ".": TokenType.DOT,
             ";": TokenType.SEMICOLON,
+            ":": TokenType.COLON
         }
 
         self.token_dictionary_operators = {
@@ -103,13 +117,13 @@ class Lexer:
         character = self.get_char()
         if character in self.token_dictionary_sign.keys():
             self.get_next_char()
-            return Token(self.token_dictionary_sign[character], "", self.current_position)
+            return Token(self.token_dictionary_sign[character], None, self.current_position)
         else:
             return None
 
     def try_build_eof(self):
         if self.get_char() == 'EOF':
-            return Token(TokenType.EOF, "", self.current_position)
+            return Token(TokenType.EOF, None, self.current_position)
         return None
 
     def try_build_comment(self):
@@ -137,16 +151,16 @@ class Lexer:
         character = self.get_char()
         if character in self.token_dictionary_operators_one_char.keys():
             self.get_next_char()
-            return Token(self.token_dictionary_operators_one_char[character], "", self.current_position)
+            return Token(self.token_dictionary_operators_one_char[character], operator, self.current_position)
         if character in ['<', '>', '=', '!']:
             operator += character
             self.get_next_char()
             character = self.get_char()
             if not character == "=":
-                return Token(self.token_dictionary_operators[operator], "", self.current_position)
+                return Token(self.token_dictionary_operators[operator], operator, self.current_position)
             elif character == "=":
                 operator += character
-                return Token(self.token_dictionary_operators[operator], "", self.current_position)
+                return Token(self.token_dictionary_operators[operator], operator, self.current_position)
         if character in ['|','&']:
             token = self.build_logical_operator(character)
             if token:
@@ -160,7 +174,7 @@ class Lexer:
         character = self.get_char()
         if character == operator:
             operator += character
-            return Token(self.token_dictionary_operators[operator], "", self.current_position)
+            return Token(self.token_dictionary_operators[operator], None, self.current_position)
         return None
 
     def try_build_number(self):
@@ -225,7 +239,6 @@ class Lexer:
     def try_build_keyword_or_identifier(self):
         text = str()
         character = self.get_char()
-
         while (character.isalpha() or character == "_" or character.isdigit()) and character != 'EOF':
             text += character
             self.get_next_char()

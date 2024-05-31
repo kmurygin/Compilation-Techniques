@@ -20,6 +20,17 @@ class TokenType(Enum):
     LIST = auto()
     DICT = auto()
 
+    LENGTH = auto()
+    DELETE = auto()
+    GET = auto()
+    CONTAINS = auto()
+    TYPE = auto()
+    AT = auto()
+    APPEND = auto()
+    REMOVE = auto()
+    FIRST = auto()
+    SECOND = auto()
+
     OR_SIGN = auto()
     AND_SIGN = auto()
     LESS_SIGN = auto()
@@ -36,6 +47,8 @@ class TokenType(Enum):
     RIGHT_BRACKET = auto()
     LEFT_CURLY_BRACKET = auto()
     RIGHT_CURLY_BRACKET = auto()
+    LEFT_SQUARE_BRACKET = auto()
+    RIGHT_SQUARE_BRACKET = auto()
 
     ADD_SIGN = auto()
     SUB_SIGN = auto()
@@ -48,6 +61,8 @@ class TokenType(Enum):
     ELSE = auto()
     RETURN = auto()
 
+    KEY = auto()
+
     FROM = auto()
     IN = auto()
     WHERE = auto()
@@ -58,7 +73,9 @@ class TokenType(Enum):
     FALSE_VALUE = auto()
 
     SEMICOLON = auto()
+    COLON = auto()
     COMMA = auto()
+    DOT = auto()
 
     COMMENT = auto()
     EOF = auto()
