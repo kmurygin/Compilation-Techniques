@@ -28,21 +28,14 @@ class Lexer:
             "string": TokenType.STRING_KEYWORD,
             "bool": TokenType.BOOL_KEYWORD,
 
-            "length": TokenType.LENGTH,
-            "delete": TokenType.DELETE,
-            "get": TokenType.GET,
-            "type": TokenType.TYPE,
-            "contains": TokenType.CONTAINS,
-            "SELECT": TokenType.SELECT,
-            "WHERE": TokenType.WHERE,
-            "FROM": TokenType.FROM,
-            "at": TokenType.AT,
-            "append": TokenType.APPEND,
-            "remove": TokenType.REMOVE,
-            "first": TokenType.FIRST,
-            "second": TokenType.SECOND,
-
-            "print": TokenType.PRINT,
+            # "SELECT": TokenType.SELECT,
+            # "WHERE": TokenType.WHERE,
+            # "FROM": TokenType.FROM,
+            # "at": TokenType.AT,
+            # "append": TokenType.APPEND,
+            # "remove": TokenType.REMOVE,
+            # "first": TokenType.FIRST,
+            # "second": TokenType.SECOND,
 
             "function": TokenType.FUNCTION,
             "for": TokenType.FOR,
@@ -55,7 +48,9 @@ class Lexer:
             "where": TokenType.WHERE,
             "select": TokenType.SELECT,
             "orderby": TokenType.ORDER_BY,
-            "EOF": TokenType.EOF
+            "EOF": TokenType.EOF,
+
+            "key": TokenType.KEY,
         }
 
         self.token_dictionary_sign = {
@@ -244,7 +239,6 @@ class Lexer:
     def try_build_keyword_or_identifier(self):
         text = str()
         character = self.get_char()
-
         while (character.isalpha() or character == "_" or character.isdigit()) and character != 'EOF':
             text += character
             self.get_next_char()
