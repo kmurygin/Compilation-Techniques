@@ -21,73 +21,22 @@ def create_parser(string):
 
 def test_parse_int():
     parser = create_parser("1")
-    assert parser.parse_int() == IntValue(1)
+    assert parser.parse_literal() == IntValue(1)
 
 
 def test_parse_float():
     parser = create_parser("1.5")
-    assert parser.parse_float() == FloatValue(1.5)
+    assert parser.parse_literal() == FloatValue(1.5)
 
 
 def test_parse_string():
     parser = create_parser('"hello"')
-    assert parser.parse_string() == StringValue("hello")
-
-
-def test_parse_declaration():
-    parser = create_parser("int a = 10")
-    assert parser.parse_declaration() == Variable("int", Identifier("a"), IntValue(10))
-
-
-def test_parse_arguments():
-    string_arguments = "int a, bool b, float c, string d"
-    parser = create_parser(string_arguments)
-    arg_1 = Variable("int", Identifier("a"), None)
-    arg_2 = Variable("bool", Identifier("b"), None)
-    arg_3 = Variable("float", Identifier("c"), None)
-    arg_4 = Variable("string", Identifier("d"), None)
-    assert parser.parse_arguments() == [arg_1, arg_2, arg_3, arg_4]
+    assert parser.parse_literal() == StringValue("hello")
 
 
 def test_parse_list():
     parser = create_parser('[10, 20, 30]')
     assert parser.parse_list() == List([IntValue(10), IntValue(20), IntValue(30)])
-
-
-def test_parse_length():
-    parser = create_parser(".length()")
-    tmp_list = [1, 2, 3]
-    assert parser.parse_collection_operation(tmp_list) == Length(tmp_list)
-
-
-def test_parse_type():
-    parser = create_parser(".type()")
-    tmp_list = [1, 2, 3]
-    assert parser.parse_collection_operation(tmp_list) == Type(tmp_list)
-
-
-def test_parse_at():
-    parser = create_parser(".at(0)")
-    tmp_list = [1, 2, 3]
-    assert parser.parse_collection_operation(tmp_list) == At(tmp_list, IntValue(0))
-
-
-def test_parse_append():
-    parser = create_parser(".append(10)")
-    tmp_list = [1, 2, 3]
-    assert parser.parse_operation_append(tmp_list) == Append(tmp_list, IntValue(10))
-
-
-def test_parse_remove():
-    parser = create_parser(".remove(123)")
-    tmp_list = [1, 2, 3]
-    assert parser.parse_operation_remove(tmp_list) == Remove(tmp_list, IntValue(123))
-
-
-def test_parse_get():
-    parser = create_parser('.get("rok")')
-    dict = {"rok": 2020}
-    assert parser.parse_operation_remove(dict) == Remove(dict, StringValue("rok"))
 
 
 def test_parse_dict():
@@ -105,23 +54,66 @@ def test_parse_pair():
 
 
 def test_parse_for():
-    parser = create_parser("for(int i in numbers){int a = 10;}")
+    parser = create_parser("for(int i in numbers){print(i);}")
+    assert parser.parse_for() == ForStatement(
+        "int",
+        Identifier("i"),
+        Identifier("numbers"),
+        Body(
+            StatementBlock(
+                [
+                    FunctionCall(
+                        Identifier("print"),
+                        Arguments([
+                            Identifier("i")
+                        ])
+                    )
+                ]
+            )
+        )
+    )
 
-    body = Body([Variable("int", Identifier("a"), IntValue(10))])
 
-    assert parser.parse_for() == ForStatement("int", Identifier("i"), Identifier("numbers"), body)
+def test_parse_for_sorted():
+    parser = create_parser("for(int i in numbers, key=funkcja_key){ print(i); }")
+    assert parser.parse_for() == ForSortedStatement(
+        "int",
+        Identifier("i"),
+        Identifier("numbers"),
+        Identifier("funkcja_key"),
+        Body(
+            StatementBlock(
+                [
+                    FunctionCall(
+                        Identifier("print"),
+                        Arguments([
+                            Identifier("i")
+                        ])
+                    )
+                ]
+            )
+        )
+    )
 
 
 def test_parse_program():
     parser = create_parser(
-        "function int name1(bool a, int b) { int a = 10; return 0; }"
+        'function int main() { function int name1(bool a, int b) { int a = 10; return a+26; }; return 0; print("Hello world!");}'
     )
 
-    arguments = [Variable("bool", Identifier("a")), Variable("int", Identifier("b"))]
-    body = FunctionBody([Variable("int", Identifier("a"), IntValue(10))], IntValue(0))
-    function = Function("int", Identifier("name1"), arguments, body)
-
-    assert parser.parse() == [function]
+    assert (parser.parse() ==
+            Program([
+                Function("int", Identifier("main"), [],
+                         StatementBlock([
+                             Function("int", Identifier("name1"),
+                                      [("bool", Identifier("a")), ("int", Identifier("b"))],
+                                      StatementBlock([
+                                          InitStatement("int", Identifier("a"), 1, 1, IntValue(10)),
+                                          ReturnStatement(AddExpression(Identifier("a"), IntValue(26)))])),
+                             FunctionCall(Identifier("print"), Arguments([StringValue("Hello world!")])),
+                             ReturnStatement("0")
+                         ])
+                         )]))
 
 
 def test_parse_add_expression():
@@ -176,9 +168,176 @@ def test_parse_and_expression():
 
 def test_parse_or_expression():
     parser = create_parser(
-        "1 || 10"
+        "1 || Kacper"
     )
     literal_1 = IntValue(1)
-    literal_2 = IntValue(10)
+    literal_2 = Identifier("Kacper")
 
     assert parser.parse_expression() == OrExpression(literal_1, literal_2)
+
+
+def test_parse_expression():
+    parser = create_parser(
+        "4 + 1 * 2 / trzy"
+    )
+    literal_1 = IntValue(1)
+    literal_2 = IntValue(2)
+    literal_3 = Identifier("trzy")
+    literal_4 = IntValue(4)
+
+    assert parser.parse_expression() == AddExpression(
+        literal_4,
+        DivisionExpression(
+            MultiplyExpression(literal_1, literal_2), literal_3
+        )
+    )
+
+
+def test_assignment():
+    parser = create_parser(
+        "a = 10"
+    )
+    identifier = Identifier("a")
+    expression = IntValue(10)
+
+    assert parser.parse_assignment() == Assignment(identifier, expression)
+
+
+def test_assignment_complex():
+    parser = create_parser(
+        "a = 10 + 20 / 10"
+    )
+    identifier = Identifier("a")
+    expression = AddExpression(IntValue(10), DivisionExpression(IntValue(20), IntValue(10)))
+    assert parser.parse_assignment() == Assignment(identifier, expression)
+
+
+def test_function_call():
+    parser = create_parser(
+        "funkcja(20, 40.7)"
+    )
+    identifier = Identifier("funkcja")
+    arguments = Arguments([IntValue("20"), FloatValue("40.7")])
+
+    assert parser.parse_function_call() == FunctionCall(identifier, arguments)
+
+
+def test_function_call_single_statement():
+    parser = create_parser(
+        "funkcja(20, 40.7)"
+    )
+    identifier = Identifier("funkcja")
+    arguments = Arguments([IntValue("20"), FloatValue("40.7")])
+
+    assert parser.parse_single_statement() == FunctionCall(identifier, arguments)
+
+
+def test_method_call():
+    parser = create_parser(
+        "obiekt.metoda(10)"
+    )
+    expression = Identifier("obiekt")
+    method_name = Identifier("metoda")
+    arguments = Arguments([IntValue("10")])
+
+    assert parser.parse_method_call() == MethodCall(expression, method_name, arguments)
+
+
+def test_parse_single_statement_method_call():
+    parser = create_parser(
+        "nazwa.metoda(10, 20);"
+    )
+    expression = Identifier("nazwa")
+    method_name = Identifier("metoda")
+    arguments = Arguments([IntValue("10"), IntValue("20")])
+
+    assert parser.parse_single_statement() == MethodCall(expression, method_name, arguments)
+
+
+def test_parse_single_statement_function_call():
+    parser = create_parser(
+        "funkcja(10, 20);"
+    )
+    function_name = Identifier("fumkcja")
+    arguments = Arguments([IntValue("10"), IntValue("20")])
+
+    assert parser.parse_single_statement() == FunctionCall(function_name, arguments)
+
+
+def test_function_declaration():
+    parser = create_parser(
+        "function int funkcja_1 (int a, int b) { a = a + 10; return a+b; }"
+    )
+    function_declaration = Function(
+        "int",
+        Identifier("funkcja_1"),
+        # enum zamiasy "int" oraz argument obuduj w klase
+        [("int", Identifier("a")), ("int", Identifier("b"))],
+        StatementBlock(
+            ReturnStatement(
+                AddExpression(Identifier("a"), Identifier("b"))
+            )
+        )
+    )
+
+    assert parser.parse_function_declaration() == function_declaration
+
+
+def test_function_params():
+    pass
+
+
+def test_var_declaration_with_assignment():
+    parser = create_parser(
+        "int a = 10;"
+    )
+    assert parser.parse_init_statement() == InitStatement("int", Identifier("a"), IntValue("10"))
+
+
+def test_var_declaration():
+    parser = create_parser(
+        "int a;"
+    )
+    assert parser.parse_init_statement() == Declaration("int", Identifier("a"))
+
+
+def test_list_declaration_with_assignment():
+    parser = create_parser(
+        "List<int> lista_1 = [1, 2, 3];"
+    )
+    assert parser.parse_init_statement() == InitStatement(
+        ListType("int"),
+        Identifier("lista_1"),
+        List([
+            IntValue("1"),
+            IntValue("2"),
+            IntValue("3")
+        ])
+    )
+
+
+def test_pair_declaration_with_assignment():
+    parser = create_parser(
+        'Pair<int, string> para_1 = (1, "Kacper")'
+    )
+    assert parser.parse_init_statement() == InitStatement(
+        PairType("int", "string"),
+        Identifier("para_1"),
+        Pair(
+            IntValue("1"),
+            StringValue("Kacper"),
+        )
+    )
+
+
+def test_dict_declaration_with_assignment():
+    parser = create_parser(
+        'Dict<int, string> slownik_1 = {1: "hello_world"}'
+    )
+    assert parser.parse_init_statement() == InitStatement(
+        DictType("int", "string"),
+        Identifier("slownik_1"),
+        Dict([
+            Pair(IntValue("1"), StringValue("hello_world"))
+        ])
+    )
