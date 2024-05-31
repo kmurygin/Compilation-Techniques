@@ -150,7 +150,6 @@ class Parser:
             self.require_and_consume(TokenType.SEMICOLON)
         return StatementBlock(statements, line, column)
 
-
     # def parse_statement_block(self):
     #     statements = []
     #     line, column = self.current_token.get_position()
@@ -165,17 +164,16 @@ class Parser:
     #         self.require_and_consume(TokenType.SEMICOLON)
     #     return StatementBlock(statements, line, column)
 
-
     def parse_single_statement(self):
         line, column = self.current_token.get_position()
         result = (
-            self.parse_for() or
-            self.parse_if() or
-            self.parse_while() or
-            self.parse_return() or
-            self.parse_function_declaration() or
-            self.parse_init_statement() or
-            self.parse_expression()
+                self.parse_for() or
+                self.parse_if() or
+                self.parse_while() or
+                self.parse_return() or
+                self.parse_function_declaration() or
+                self.parse_init_statement() or
+                self.parse_expression()
         )
         return result
 
@@ -289,13 +287,13 @@ class Parser:
 
     def parse_factor(self):
         return (
-            self.parse_identifier() or
-            # self.parse_function_call() or
-            # self.parse_method_call() or
-            self.parse_literal() or
-            self.parse_list() or
-            self.parse_pair() or
-            self.parse_dict()
+                self.parse_identifier() or
+                # self.parse_function_call() or
+                # self.parse_method_call() or
+                self.parse_literal() or
+                self.parse_list() or
+                self.parse_pair() or
+                self.parse_dict()
         )
 
     # def parse_identifier_or_function_method_call(self):
@@ -344,7 +342,6 @@ class Parser:
         # self.require_and_consume(TokenType.GREATER_SIGN)
         return type_container
 
-
     def parse_list_type(self):
         line, column = self.current_token.get_position()
         self.require_and_consume(TokenType.LIST)
@@ -363,7 +360,6 @@ class Parser:
         self.require_and_consume(TokenType.GREATER_SIGN)
         return PairType(first_type, second_type, line, column)
 
-
     def parse_dict_type(self):
         line, column = self.current_token.get_position()
         self.require_and_consume(TokenType.DICT)
@@ -373,7 +369,6 @@ class Parser:
         value_type = self.parse_type()
         self.require_and_consume(TokenType.GREATER_SIGN)
         return DictType(key_type, value_type, line, column)
-
 
     def parse_list(self):
         line, column = self.current_token.get_position()
@@ -487,10 +482,9 @@ class Parser:
         self.require_and_consume(TokenType.RIGHT_CURLY_BRACKET)
 
         if key_function is None:
-            return ForStatement(type, var, collection, content,line, column)
+            return ForStatement(type, var, collection, content, line, column)
         else:
             return ForSortedStatement(type, var, collection, key_function, content, line, column)
-
 
     def parse_while(self):
         line, column = self.current_token.get_position()
