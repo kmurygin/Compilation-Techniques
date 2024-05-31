@@ -286,7 +286,8 @@ class Parser:
         return result
 
     def parse_factor(self):
-        return (
+        line, column = self.current_token.get_position()
+        result = (
                 self.parse_identifier() or
                 # self.parse_function_call() or
                 # self.parse_method_call() or
@@ -295,7 +296,20 @@ class Parser:
                 self.parse_pair() or
                 self.parse_dict()
         )
-
+        if self.current_token.get_type() == TokenType.DOT:
+            self.require_and_consume(TokenType.DOT)
+            method_name = self.parse_identifier()
+            self.require_and_consume(TokenType.LEFT_BRACKET)
+            arguments = self.parse_arguments()
+            self.require_and_consume(TokenType.RIGHT_BRACKET)
+            return MethodCall(result, method_name, arguments, line, column)
+        if isinstance(result, Identifier):
+            if self.current_token.get_type() == TokenType.LEFT_BRACKET:
+                self.require_and_consume(TokenType.LEFT_BRACKET)
+                arguments = self.parse_arguments()
+                self.require_and_consume(TokenType.RIGHT_BRACKET)
+                return FunctionCall(result, arguments, line, column)
+        return result
     # def parse_identifier_or_function_method_call(self):
     #     line, column = self.current_token.get_position()
     #     identifier = self.parse_identifier()

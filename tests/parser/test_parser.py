@@ -341,3 +341,30 @@ def test_dict_declaration_with_assignment():
             Pair(IntValue("1"), StringValue("hello_world"))
         ])
     )
+
+
+def test_parse_add_with_function_call():
+    parser = create_parser(
+        "a + funkcja(10)"
+    )
+    assert parser.parse_single_statement() == AddExpression(
+        Identifier("a"),
+        FunctionCall(
+            Identifier("funkcja"),
+            Arguments([IntValue("10")])
+        )
+    )
+
+
+def test_parse_add_with_method_call():
+    parser = create_parser(
+        "a + slownik.get(10)"
+    )
+    assert parser.parse_single_statement() == AddExpression(
+        Identifier("a"),
+        MethodCall(
+            Identifier("slownik_1"),
+            Identifier("get"),
+            Arguments([IntValue("10")])
+        )
+    )
