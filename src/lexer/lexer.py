@@ -163,6 +163,7 @@ class Lexer:
                 return Token(self.token_dictionary_operators[operator], operator, self.current_position)
         if character in ['|','&']:
             token = self.build_logical_operator(character)
+            self.get_next_char()
             if token:
                 return token
         return None
