@@ -98,7 +98,7 @@ class Parser:
         self.require_and_consume(TokenType.LEFT_CURLY_BRACKET)
         body = self.parse_statement_block()
         self.require_and_consume(TokenType.RIGHT_CURLY_BRACKET)
-        return Function(function_type, identifier, params, body, line, column)
+        return FunctionDefinition(function_type, identifier, params, body, line, column)
 
     def parse_function_params(self):
         line, column = self.current_token.get_position()
@@ -140,6 +140,8 @@ class Parser:
             argument = self.parse_expression()
             # self.consume()
             arguments.append(argument)
+        if arguments == [None]:
+            arguments = []
         return Arguments(arguments, line, column)
 
     def parse_statement_block(self):
@@ -195,7 +197,7 @@ class Parser:
 
     def parse_return(self):
         line, column = self.current_token.get_position()
-        if self.current_token.get_type() != TokenType.IF:
+        if self.current_token.get_type() != TokenType.RETURN:
             return None
         self.require_and_consume(TokenType.RETURN)
         expression = self.parse_expression()
@@ -241,6 +243,10 @@ class Parser:
                 arguments = self.parse_arguments()
                 self.require_and_consume(TokenType.RIGHT_BRACKET)
                 return FunctionCall(result, arguments, line, column)
+            elif self.current_token.get_type() == TokenType.ASSIGN:
+                self.require_and_consume(TokenType.ASSIGN)
+                expression = self.parse_expression()
+                return Assignment(result, expression, line, column)
 
         return result
 
@@ -250,7 +256,7 @@ class Parser:
             return None
         while self.current_token.get_type() == TokenType.AND_SIGN:
             self.require_and_consume(TokenType.AND_SIGN)
-            result = AndExpression(result, self.parse_and_expression())
+            result = AndExpression(result, self.parse_relation_expression())
         return result
 
     def parse_relation_expression(self):
@@ -260,6 +266,7 @@ class Parser:
         if self.current_token.get_type() in RELATION_SIGNS.keys():
             constructor = RELATION_SIGNS[self.current_token.get_type()]
             line, column = self.current_token.get_position()
+            self.consume()
             result = constructor(result, self.parse_sum_expression(), line, column)
         return result
 
@@ -455,18 +462,18 @@ class Parser:
         self.require_and_consume(TokenType.RIGHT_BRACKET)
         self.require_and_consume(TokenType.LEFT_CURLY_BRACKET)
         if self.current_token.get_type() != TokenType.RIGHT_CURLY_BRACKET:
-            content = self.parse_content()
+            content = self.parse_statement_block()
         else:
             content = []
-        true_statement = Body(content)
+        true_statement = content
         self.require_and_consume(TokenType.RIGHT_CURLY_BRACKET)
         self.require_and_consume(TokenType.ELSE)
         self.require_and_consume(TokenType.LEFT_CURLY_BRACKET)
         if self.current_token.get_type() != TokenType.RIGHT_CURLY_BRACKET:
-            content = self.parse_content()
+            content = self.parse_statement_block()
         else:
             content = []
-        false_statement = Body(content)
+        false_statement = content
         self.require_and_consume(TokenType.RIGHT_CURLY_BRACKET)
         return IfStatement(condition, true_statement, false_statement, line, column)
 
@@ -513,6 +520,5 @@ class Parser:
             content = self.parse_statement_block()
         else:
             content = []
-        content = Body(content)
         self.require_and_consume(TokenType.RIGHT_CURLY_BRACKET)
         return WhileStatement(condition, content, line, column)
