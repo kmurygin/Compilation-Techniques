@@ -51,7 +51,7 @@ pair_inside		= "[" text | number | container_inside "," text | number | containe
 dict_inside		= "{" {  text | number | container_inside ":" text | number | container_inside  } "}"
 
 expression 		= and_expression {or_sign expression}
-and_expression 		= relation_expression {and_sign and_expression}
+and_expression 		= relation_expression {and_sign relation_expression}
 relation_expression 	= sum_expression [relation_expression sum_expression]
 sum_expression 		= multiply_expression {additive_sign multiplicative_expression}
 multiply_expression 	= factor {multiplicative_sign factor}

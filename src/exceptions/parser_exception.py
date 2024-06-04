@@ -26,7 +26,7 @@ class NoClosingCurlyBracketError(ParserException):
         super().__init__(position)
 
     def __str__(self):
-        return"NoClosingCurlyBracketError: Missing closing curly bracket in line:{self.line} column:{self.column}"
+        return f"NoClosingCurlyBracketError: Missing closing curly bracket in line:{self.line} column:{self.column}"
 
 
 class NoClosingBracketError(ParserException):
@@ -34,4 +34,4 @@ class NoClosingBracketError(ParserException):
         super().__init__(position)
 
     def __str__(self):
-        return"NoClosingBracketError: Missing closing bracket in line:{self.line} column:{self.column}"
+        return f"NoClosingBracketError: Missing closing bracket in line:{self.line} column:{self.column}"

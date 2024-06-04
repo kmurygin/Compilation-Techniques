@@ -127,12 +127,12 @@ def test_parse_add_expression():
 
 def test_parse_less_expression():
     parser = create_parser(
-        "1 < 3"
+        "1 > 6"
     )
-    parsed = parser.parse_expression()
+    # parsed = parser.parse_expression()
     # assert parsed.left == IntValue("1")
-    assert parsed.right == IntValue("3")
-    # assert parser.parse_relation_expression() == LessThanExpression(left_term=)
+    # assert parsed.right == IntValue("3")
+    assert parser.parse_expression() == "LessThanExpression(left_term=)"
 
 def test_parse_subtract_expression():
     parser = create_parser(
@@ -399,3 +399,31 @@ def test_parse_list_declaration():
         "List<int> lista_1 = [1, 2, 3];"
     )
     assert parser.parse_single_statement() == ""
+
+
+def test_parse_dict_declaration():
+    parser = create_parser(
+        'Dict<string, int> lista_1 = {"rok": 2024};'
+    )
+    assert parser.parse_single_statement() == ""
+
+
+def test_parse_pair_declaration():
+    parser = create_parser(
+        'Pair<int, string> para_1 = (1, "Kacper")'
+    )
+    assert parser.parse_single_statement() == ""
+
+
+def test_parse_linq():
+    parser = create_parser(
+        'from int tabelka in zdanie where tabelka > 10 select wybor orderby wybor.first() '
+    )
+    assert parser.parse_single_statement() == ""
+
+
+def test_parse_linq_2():
+    parser = create_parser(
+        'function int main(){ Dict<int, string> ludzie = {19, "Kacper"}; List<string> adults = from Pair<int, string> para in ludzie where para.first() > 18 select para.second() orderby para.first(); return adults;}'
+    )
+    assert parser.parse_function_declaration() == ""
