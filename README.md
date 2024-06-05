@@ -1,7 +1,7 @@
 # KacperScript - projekt tkom
 ## Dokumentacja końcowa
 
-Celem projektu jest stworzenie języka, oferującego podstawowe własności
+Celem projektu było stworzenie języka, oferującego podstawowe własności
 języków programowania wraz z wbudowanym typem słownika.
 Dostępne operacje na słowniku:
 - dodawanie elementów
@@ -214,18 +214,21 @@ if (zmienna >= 0) { print(“Nieujemna”); }
 ## Instrukcja pętli for
 Pętla for w moim języku będzie podobna składnią do innych języków
 programowania.
+```
 for ( typ_zmiennej zmienna : iterowalna_zmienna) {
-//blok instrukcji
-//mamy tutaj dostęp do zmiennej zmienna – elementy iterowalna_zmienna
+    //blok instrukcji
+    //mamy tutaj dostęp do zmiennej zmienna – elementy iterowalna_zmienna
 }
-Dict<string, int> imiona_lata = Dict();
-wiek[“Kasia”] = 21;
-wiek[“Basia”] = 22;
+Dict<string, int> imiona_lata;
+wiek.add("Kasia", 22)
+wiek.add(“Basia", 45);
 for (Pair<string, int> para_im in imiona_lata) {
-print(“Imie: ”+ para_im.first);
-print(“Wiek: ”+ para_im.second);
+    print(“Imie: ” + para_im.first());
+    print(“Wiek: ” + para_im.second());
 } 
+```
 ## Własne funkcje
+Użytkownik może definiować własne funkcje, zawierające typ
 1. Definiowanie własnej funkcji
 ```
 function zwracany_typ nazwa_funkcji(lista_argumentów){
@@ -275,43 +278,54 @@ print(“Witaj” + imie + “!”);
 }
 przywitanie(“Kacper”, “Murygin”)
 [ERROR] Function error: Wrong number of arguments- 2 instead of 1:
-line 5
-15. Testowanie:
-Do testowania wykorzystam testy jednostkowe, napisane przy użyciu
+line 5 
+## Testowanie:
+Do testowania wykorzystam testy jednostkowe oraz integracyjne, napisane przy użyciu
 frameworka pytest.
-16. Sposób uruchomienia:
+Test zostały zamieszczone w katalogu tests, podzielone dla testy dla danego modułu. 
+## Sposób uruchomienia interpreter:
 Uruchamiamy poprzez komendę:
-python3 interpreter.py <sciezka do pliku>
+./main.py <sciezka do pliku>
 17. Przykładowy kod
-function int sort_elements(Pair<string, int> para_elementow){
-return para_elementow.first;
+
+```
+function int a(int b)
+{
+   if ( b + 2 > 7 ) { return b; }
+   else { return 7; };
 }
+
+function List<string> linq_test(){
+    Dict<int, string> ludzie = {19: "Kacper", 7: "Klara", 21: "Steve", 23: "Kamil"};
+    List<string> adults = from Pair<int, string> para in ludzie where para.first() > 18 select para.second() orderby para.first();
+
+    return adults;
+}
+
+function int print_hello(){
+    int i = 10;
+    while( i > 0 ) {
+        print("Hello world!");
+        i = i - 1;
+    };
+}
+
 function int main(){
-int liczba_a = 0;
-Dict<string, float> kursy_walut = new Dict();
-kursy_walut[“euro”] = 4.8;
-kursy_walut[“dolar”] = 4.0;
-kursy_walut[“jen”] = 2.0;
-//pętla for wypisująca zawartość słownika
-for (Pair<string, float> kurs: kursy_walut) {
-print(“Name: ” + kurs.first);
-print(“Value: ” + kurs.second);
+    # float a = 3.14;
+
+    print([1, 2, 3]);
+    List<int> lista = [1, 2, 3, 4];
+    Pair<int, string> para = (1, "kacper");
+    Dict<int, string> slownik = {1: "kacpi", 2: "tomek"};
+    # slownik = slownik.add(3, "7");
+    # print(slownik);
+    # for (int a in lista) {
+    #   print(a);
+    # };
+
+    return a(100);
 }
-//pętla for wypisująca zawartość słownika, w zadanej kolejności
-for (Pair<string, float> kurs: kursy_walut, key= {
-print(“Name: ” + kurs.first);
-print(“Value: ” + kurs.second);
-}
-}
-//funkcja służąca do liczenia silni, wykorzystuje rekurencję
-function int silnia(int liczba){
-if ( liczba <= 1) {
-return 1;
-}
-else {
-return liczba * silnia(liczba - 1);
-}
-}
+```
 
 ## Gramatyka
 ```

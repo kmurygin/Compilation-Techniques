@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+
+import sys
+
 from src.interpreter.interpreter import Interpreter
 from src.reader import Reader
 from src.lexer.lexer import Lexer
@@ -11,9 +15,9 @@ def main(file):
         parser = Parser(reader, lexer)
         program = parser.parse()
         interpreter = Interpreter(program)
-        result = interpreter.run_main_function()
+        result = interpreter.visit_program()
         print(result)
 
 
 if __name__ == '__main__':
-    main("program.ks")
+    main(sys.argv[1])

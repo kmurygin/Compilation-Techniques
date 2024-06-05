@@ -188,7 +188,7 @@ def test_list_append():
 
 def test_list_remove():
     string = """
-    function int main(){ List<string> lista = ["Warszawa", "Łódź", "Gdańsk"]; return lista.remove("Warszawa"); }
+    function List<string> main(){ List<string> lista = ["Warszawa", "Łódź", "Gdańsk"]; return lista.remove("Warszawa"); }
     """
     result = get_return_value_from_main(string)
     assert result == ["Łódź", "Gdańsk"]

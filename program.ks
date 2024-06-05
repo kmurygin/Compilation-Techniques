@@ -22,20 +22,20 @@ function int print_hello(){
 function int main(){
     # float a = 3.14;
 
-    print([1, 2, 3]);
-    List<int> lista = ["", "", "", ""];
+    # print([1, 2, 3]);
+    List<int> lista = [1, 2, 3, 4];
     Pair<int, string> para = (1, "kacper");
     Dict<int, string> slownik = {1: "kacpi", 2: "tomek"};
     # slownik = slownik.add(3, "7");
     # print(slownik);
     for (int a in lista) {
-        print(a);
-     };
+       print(a + 1);
+    };
     # print(linq_test());
     # print(lista);
     print(para.second());
     # print(slownik);
-    print(linq_test());
+    #print(linq_test());
 
     return a(100);
 }
