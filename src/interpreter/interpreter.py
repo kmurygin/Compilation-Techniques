@@ -61,7 +61,7 @@ def get_print(arguments):
 
 
 def get_int(value):
-    return int(value)
+    return int(value[0])
 
 
 def get_string():
@@ -84,8 +84,8 @@ BUILTIN_METHODS = {
 
 BUILTIN_FUNCTIONS = {
     'print': get_print,
-    'int': get_int,
-    'string': get_string
+    'get_int': get_int,
+    'get_string': get_string
 }
 
 
@@ -98,6 +98,13 @@ class Interpreter:
         self.program = program
         self.last_value = None
 
+        self.builtin_functions = {
+            'print': lambda arguments: print(*arguments),
+            'get_int': lambda value: setattr(self, 'last_value', int(value[0])),
+            'get_float': lambda value: setattr(self, 'last_value', float(value[0])),
+            'get_string': lambda value: setattr(self, 'last_value', str(value[0]))
+        }
+
     def visit_program(self):
         for declaration in self.program.program_body:
             declaration.accept(self)
@@ -109,7 +116,6 @@ class Interpreter:
         )
         return self.run_main_function()
 
-# visit program uruchamia maina
     def run_main_function(self):
         main_function = self.function_definitions['main']
         main_function_call = FunctionCall(Identifier('main'), Arguments([]), 0, 0)
@@ -136,7 +142,7 @@ class Interpreter:
         init_statement.expression.accept(self)
         value = self.last_value
         try:
-            init_statement.type.accept(self) #tutaj
+            init_statement.type.accept(self)
         except TypeError:
             init_statement.type.accept(self, self)
         type = self.last_value
@@ -177,13 +183,9 @@ class Interpreter:
     def visit_function_call(self, function_call):
         function_call.identifier.accept(self)
         function_id = self.last_value
-        # if function_id in BUILTIN_FUNCTIONS.keys:
-        #     function = BUILTIN_FUNCTIONS[function_id]
-        #     function(function_call.arguments)
-        # slownika zawiera funckje uzytkownikani wbudowane
-        # drugi slownik z lambda dla funkcji wbudowanych
-        if function_id in BUILTIN_FUNCTIONS:
-            function = BUILTIN_FUNCTIONS[function_id]
+
+        if function_id in self.builtin_functions:
+            function = self.builtin_functions[function_id]
             function_call.arguments.accept(self)
             function(self.last_value)
         else:
@@ -196,10 +198,10 @@ class Interpreter:
             )
             self.scopes_stack.append(self.current_scope)
             if len(self.scopes_stack) == 10:
-                raise ValueError()
+                raise MaximumRecursionExceededError(function_call.position)
             self.current_scope = new_scope
             function_definition.body.accept(self)
-#czy typy w metodzie sie zgadzaja
+
     def visit_method_call(self, method_call):
         method_call.expression.accept(self)
         method_expression = self.last_value
@@ -213,8 +215,7 @@ class Interpreter:
         if variable_name is not None:
             method_expression = variable_name
         self.last_value = method_body(method_expression, method_arguments)
-# self.last_value = ..
-# jezeli return przerwij wywolanie bloku
+
     def visit_statement_block(self, statement_block):
         for statement in statement_block.statements:
             statement.accept(self)
@@ -299,7 +300,7 @@ class Interpreter:
             if return_value:
                 pass
             if i == 100:
-                raise ValueError()
+                raise MaximumIterationsExceededError(while_statement.position)
 
             while_statement.condition.accept(self)
             condition = self.last_value
@@ -333,22 +334,22 @@ class Interpreter:
                 scope = self.scopes_stack.pop()
                 self.current_scope = scope
                 self.last_value = return_value
+            else:
+                raise WrongTypeReturnError(self.current_scope.return_value_type, type(return_value),
+                                           return_statement.position)
         else:
             self.current_scope.return_value_type.accept(self)
-            if self.last_value == return_value:
+            if self.last_value == return_value[0]:
                 scope = self.scopes_stack.pop()
                 self.current_scope = scope
                 self.last_value = return_value
-        # try:
-        #     self.current_scope.return_value_type.accept(self)
-        #     raise WrongTypeReturnError(self.last_value[1].__name__, type(return_value[1][0]).__name__, return_statement.position)
-        # except Exception:
-        #     raise WrongTypeReturnError(self.current_scope.return_value_type, type(return_value), return_statement.position)
+            else:
+                raise WrongTypeReturnError(self.last_value[1].__name__, type(return_value[1][0]).__name__,
+                                           return_statement.position)
 
     def visit_expression(self, expression):
         pass
 
-# czy prawa i lew bool
     def visit_and_expression(self, and_expression):
         and_expression.left.accept(self)
         left_result = self.last_value
@@ -396,12 +397,13 @@ class Interpreter:
         right_result = self.last_value
         self.last_value = left_result * right_result
 
-# dzilenie przez 0
     def visit_division_expression(self, division_expression):
         division_expression.left.accept(self)
         left_result = self.last_value
         division_expression.right.accept(self)
         right_result = self.last_value
+        if right_result == 0:
+            raise ZeroDivisionError(division_expression.position)
         self.last_value = left_result / right_result
 
     def visit_less_than_expression(self, less_than_expression):

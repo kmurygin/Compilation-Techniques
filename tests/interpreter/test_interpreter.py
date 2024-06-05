@@ -84,7 +84,7 @@ def test_if_falss():
 
 def test_if_condition():
     string = """
-    function int main(){ if( 10 < 20) { return "C++"; } else { return "Python"; };}
+    function string main(){ if( 10 < 20) { return "C++"; } else { return "Python"; };}
     """
     result = get_return_value_from_main(string)
     assert result == "C++"
@@ -200,3 +200,25 @@ def test_linq_query():
     """
     result = get_return_value_from_main(string)
     assert result == ""
+
+
+def test_get_int():
+    string = """
+    function int main(){ return get_int(57.2); }
+    """
+    result = get_return_value_from_main(string)
+    assert result == 57
+
+def test_get_int():
+    string = """
+    function float main(){ return get_float(57); }
+    """
+    result = get_return_value_from_main(string)
+    assert result == 57.0
+
+def test_get_string():
+    string = """
+    function string main(){ return get_string(2012); }
+    """
+    result = get_return_value_from_main(string)
+    assert result == "2012"

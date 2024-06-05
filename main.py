@@ -15,8 +15,11 @@ def main(file):
         parser = Parser(reader, lexer)
         program = parser.parse()
         interpreter = Interpreter(program)
-        result = interpreter.visit_program()
-        print(result)
+        try:
+            result = interpreter.visit_program()
+            print(result)
+        except Exception as e:
+            print(e)
 
 
 if __name__ == '__main__':

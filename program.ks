@@ -1,6 +1,6 @@
 function int a(int b)
 {
-   if ( b + 2 > 7 ) { return b; }
+   if ( b + 2 > 7 ) { return 10; }
    else { return 7; };
 }
 
@@ -13,9 +13,8 @@ function List<string> linq_test(){
 
 function int print_hello(){
     int i = 10;
-    while( i > 0 ) {
+    while( 10 > 0 ) {
         print("Hello world!");
-        i = i - 1;
     };
 }
 
@@ -33,11 +32,13 @@ function int main(){
     };
     # print(linq_test());
     # print(lista);
-    print(para.second());
+    #print(para.second());
     # print(slownik);
-    #print(linq_test());
-    int b = 3.14;
-    return a(100);
+    print_hello();
+    print(linq_test());
+    #int b = 3;
+    #print(10);
+    return a(1);
 }
 
 

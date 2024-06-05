@@ -50,3 +50,27 @@ class FunctionNotDefinedError(Exception):
 
     def __str__(self):
         return f"FunctionNotDefinedError: Function {self.function_name} is not defined, line: {self.position[0]} at column: {self.position[1]}"
+
+
+class ZeroDivisionError(Exception):
+    def __init__(self, position):
+        self.position = position
+
+    def __str__(self):
+        return f"ZeroDivisionError: Division by zero is not defined, line: {self.position[0]} at column: {self.position[1]}"
+
+
+class MaximumIterationsExceededError(Exception):
+    def __init__(self, position):
+        self.position = position
+
+    def __str__(self):
+        return f"MaximumIterationsExceededError: Maximum iterations exceeded, line: {self.position[0]} at column: {self.position[1]}"
+
+
+class MaximumRecursionExceededError(Exception):
+    def __init__(self, position):
+        self.position = position
+
+    def __str__(self):
+        return f"MaximumRecursionExceededError: Maximum recursion exceeded, line: {self.position[0]} at column: {self.position[1]}"
