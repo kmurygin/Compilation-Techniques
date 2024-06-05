@@ -16,7 +16,7 @@ def get_return_value_from_main(string):
     parser = create_parser(string)
     program = parser.parse()
     interpreter = Interpreter(program)
-    return interpreter.run_main_function()
+    return interpreter.visit_program()
 
 
 def test_simple_main():
@@ -44,7 +44,7 @@ def test_init_statement():
 
 def test_list():
     string = """
-    function int main(){return [1,2,3];}
+    function List<int> main(){return [1, 2, 3];}
     """
     result = get_return_value_from_main(string)
     assert result == [1, 2, 3]

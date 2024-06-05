@@ -135,7 +135,10 @@ class Interpreter:
 
         init_statement.expression.accept(self)
         value = self.last_value
-        init_statement.type.accept(self) #tutaj
+        try:
+            init_statement.type.accept(self) #tutaj
+        except TypeError:
+            init_statement.type.accept(self, self)
         type = self.last_value
         self.check_type(type, value, (init_statement.line, init_statement.column))
 
@@ -332,7 +335,7 @@ class Interpreter:
                 self.last_value = return_value
         else:
             self.current_scope.return_value_type.accept(self)
-            if self.last_value == return_value[0]:
+            if self.last_value == return_value:
                 scope = self.scopes_stack.pop()
                 self.current_scope = scope
                 self.last_value = return_value
@@ -351,6 +354,8 @@ class Interpreter:
         left_result = self.last_value
         if type(left_result) is not bool:
             raise WrongTypeError(bool, type(left_result), and_expression.position)
+        if not left_result:
+            self.last_value = False
         and_expression.right.accept(self)
         right_result = self.last_value
         if type(left_result) is not bool:
@@ -362,6 +367,8 @@ class Interpreter:
         left_result = self.last_value
         if type(left_result) is not bool:
             raise WrongTypeError(bool, type(left_result), or_expression.position)
+        if left_result:
+            self.last_value = True
         or_expression.right.accept(self)
         right_result = self.last_value
         if type(left_result) is not bool:
@@ -521,5 +528,5 @@ class Interpreter:
                         raise WrongTypeError(type_2.__name__, type(pair[1]).__name__, position)
                 return True
         except TypeError:
-            raise WrongTypeError(expected_type, value, position)
+            raise WrongTypeError(expected_type, type(value), position)
         raise WrongTypeError(expected_type, value, position)

@@ -36,6 +36,12 @@ function int main(){
     print(para.second());
     # print(slownik);
     #print(linq_test());
-
+    int b = 3.14;
     return a(100);
+}
+
+
+function int main_1(){
+    int a = 10;
+    return a;
 }
