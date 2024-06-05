@@ -1,4 +1,4 @@
-# KacperScript - projekt tkom
+# KacperScript
 ## Dokumentacja końcowa
 
 Celem projektu było stworzenie języka, oferującego podstawowe własności
@@ -9,6 +9,13 @@ Dostępne operacje na słowniku:
 - wyszukiwanie elementów według klucza
 - iterowanie po elementach zgodnie z zadaną kolejnością
 - wykonanie na słowniku zapytań w stylu LINQ
+
+## Sposób uruchomienia interpreter:
+Do uruchomienia programu napisanego w KacperScript wymagany jest zainstalowany Python.
+Uruchamiamy poprzez komendę:
+````
+./main.py <sciezka_do_programu>
+````
 
 Przykładowy kod
 ```
@@ -28,6 +35,35 @@ function int main(){
     return 0;
 }
 ```
+Ten kod definiuje dwie funkcje: `linq_test()` i `main()`, w języku KacperScript.
+
+### Funkcja `linq_test()`:
+- Zwraca listę łańcuchów znaków.
+- Tworzy słownik `ludzie` zawierający informacje o ludziach (klucz: wiek, wartość: imię).
+- Tworzy listę `adults` zawierającą imiona dorosłych osób (wiek > 18), posortowane wg wieku.
+- Zwraca listę `adults`.
+
+### Funkcja `main()`:
+- Zwraca liczbę całkowitą.
+- Tworzy listę `lista` z czterema liczbami całkowitymi.
+- Iteruje przez elementy listy `lista`, wypisując każdy na ekran.
+- Wypisuje wynik funkcji `linq_test()`.
+- Zwraca wartość `0`.
+
+## Moduły projektu
+
+### Reader
+Moduł **Reader** jest odpowiedzialny za interakcję z zewnętrznym źródłem danych, takim jak plik tekstowy lub strumień wejściowy. Jego głównym zadaniem jest odczytywanie tekstu źródłowego programu z tego źródła w sposób kontrolowany. Może to obejmować odczytywanie tekstu po jednym znaku lub linii na raz, w zależności od potrzeb analizatorów leksykalnych i parserów. Moduł **Reader** zapewnia interfejs do odczytu i nawigacji po tekście źródłowym, a także obsługę zdarzeń, takich jak osiągnięcie końca pliku lub napotkanie błędu podczas odczytu.
+
+### Lexer
+Lexer jest często nazywany **analizatorem leksykalnym**. Jego głównym zadaniem jest przekształcenie sekwencji znaków z tekstu źródłowego na strumień tokenów, które reprezentują najmniejsze jednostki leksykalne języka programowania, takie jak słowa kluczowe, identyfikatory, liczby, operatory, itp. Moduł **Lexer** wykonuje analizę leksykalną, rozpoznając i klasyfikując różne typy tokenów zgodnie z regułami gramatyki języka. Tokeny te są później przekazywane do **analizatora składniowego** (parsera) w celu dalszej analizy i przetwarzania.
+
+### Parser
+Parser jest **analizatorem składniowym**, który przekształca strumień tokenów wygenerowanych przez lekser na strukturę drzewa składniowego. Drzewo składniowe odzwierciedla hierarchię składniową programu, zgodnie z regułami gramatyki języka programowania. **Parser** analizuje sekwencję tokenów, sprawdzając ich kolejność i relacje, aby zbudować poprawną strukturę drzewa składniowego. W przypadku błędów składniowych parser może zgłosić wyjątek lub przeprowadzić próbę naprawy błędów.
+
+### Interpreter
+Interpreter wykonuje kod programu, który został przetworzony przez **analizator składniowy**. Jest odpowiedzialny za interpretację struktury drzewa składniowego i wykonanie odpowiednich działań zgodnie z instrukcjami zawartymi w programie. Interpreter przechodzi przez każdy element drzewa składniowego, wykonując operacje takie jak przypisywanie wartości do zmiennych, wywoływanie funkcji, kontrola przepływu, operacje arytmetyczne, itp. Wyniki operacji są zazwyczaj przechowywane w pamięci i mogą być wykorzystywane w kolejnych krokach wykonania programu.
+
 ## Wymagania funkcjonalne i niefunkcjonalne:
 1. Program musi zawierać funkcję main ze zwracanym typem int
 2. Każda linia kodu kończy się średnikiem- „;”
@@ -58,16 +94,19 @@ function int main(){
 
 ## Konwersja typów
 W języku będą dostępne dwa rodzaje konwersji typów:
-- z int na float
+- z float na float
 - z float na int.
+- z int/float na string
+
 Pierwszy przypadek jest prostszy, do liczby całkowitej zostaje dodana
 część ułamkowa równa 0. W drugim przypadku zaś, część ułamkowa
 zostaje wycięta, pozostaje jedynie część całkowita.
 ```
 int x = 10;
-float y = float(x); # y = 10.0
+float y = get_float(x); # y = 10.0
 float a = 5.9;
-int b = int(a); # b = 5
+int b = get_int(a); # b = 5
+string c = get_string(b)
 ```
 W przypadku innych konwersji- niedozwolonych np. próba konwersji
 stringa na int, zostanie zgłoszony wyjątek.
@@ -251,41 +290,103 @@ function void przywitanie(string imie) {
 2. Przekazywanie argumentów do funkcji przez wartość
 3. Język umożliwia rekursywne wywołania funkcji 
 ## Obsługa błędów:
-1) Błąd składniowy
-Przykład:
-int a = 10;
-if (a == 10) { print(“10”);
-[ERROR] Syntax error: missing “}” at line 23
-int przywitanie() {
-print(“Hello world!”)
-}
-[ERROR] Syntax error: missing “;” at line 42
-b) Błąd dzielenia przez 0
-Przykład:
-print(10 / 0);
-[ERROR] Dividing by zero: 10/0 at line 32
-c) Błąd w indeksowaniu
-list[int] = new list([1,2,3])
-print(list.at(4))
-[ERROR] Index error: list index out of range at line 87
-d) Błąd w konwersji typów
-string imie = “Kacper”;
-int imie_int = int(imie);
-[ERROR] Value error: invalid literal for int(): “kacper”
-e) Zła ilość argumentów przekazanych do funkcji:
-function void przywitanie(string imie) {
-print(“Witaj” + imie + “!”);
-}
-przywitanie(“Kacper”, “Murygin”)
-[ERROR] Function error: Wrong number of arguments- 2 instead of 1:
-line 5 
+### Wyjątki:
+
+| Nazwa wyjątku                       | Opis                                                                                                       |
+|-------------------------------------|------------------------------------------------------------------------------------------------------------|
+| `WrongTypeError`                    | Występuje, gdy typ zmiennej nie jest zgodny z oczekiwanym typem.                                            |
+| `DifferentTypesListError`           | Występuje, gdy lista zawiera elementy różnych typów.                                                        |
+| `UndefinedVariableError`            | Występuje, gdy używana zmienna nie została zdefiniowana.                                                    |
+| `WrongTypeReturnError`              | Występuje, gdy typ zwracany przez funkcję nie jest zgodny z oczekiwanym typem.                              |
+| `FunctionAlreadyDefinedError`       | Występuje, gdy próbuje się zdefiniować funkcję, która już została zdefiniowana.                             |
+| `FunctionNotDefinedError`           | Występuje, gdy wywołana funkcja nie została zdefiniowana.                                                   |
+| `ZeroDivisionError`                 | Występuje, gdy następuje próba dzielenia przez zero.                                                        |
+| `LexerException`                    | Ogólny wyjątek dla błędów leksykalnych zawierający informacje o linii i kolumnie błędu.                      |
+| `CommentTooLongException`           | Występuje, gdy komentarz jest zbyt długi.                                                                   |
+| `StringTooLongException`            | Występuje, gdy ciąg znaków jest zbyt długi.                                                                 |
+| `IdentifierTooLongException`        | Występuje, gdy identyfikator jest zbyt długi.                                                               |
+| `UnclosedStringException`           | Występuje, gdy ciąg znaków nie został zamknięty.                                                            |
+| `NumberException`                   | Występuje, gdy liczba jest zbyt duża.                                                                       |
+| `ParserException`                   | Ogólny wyjątek dla błędów parsowania zawierający informacje o linii i kolumnie błędu.                        |
+| `SyntaxError`                       | Występuje, gdy składnia kodu jest niepoprawna.                                                              |
+| `NoSemicolonError`                  | Występuje, gdy brakuje średnika w kodzie.                                                                   |
+| `NoClosingCurlyBracketError`        | Występuje, gdy brakuje zamykającego nawiasu klamrowego w kodzie.                                            |
+| `NoClosingBracketError`             | Występuje, gdy brakuje zamykającego nawiasu w kodzie.                                                       |
+| `MaximumIterationsExceededError`| Błąd zgłaszany, gdy liczba iteracji przekracza maksymalną dopuszczalną wartość.                                      |
+| `MaximumRecursionExceededError` | Błąd sygnalizujący, że maksymalna liczba rekursji została przekroczona.                                      |
+
+### Wyjątki typów
+
+- **`WrongTypeError`**
+  - Tekst: "WrongTypeError: Expected type {expected}, but got {actual} at position {position}"
+
+- **`DifferentTypesListError`**
+  - Tekst: "DifferentTypesListError: Different types of elements at position {position}"
+
+- **`UndefinedVariableError`**
+  - Tekst: "UndefinedVariableError: Undefined variable {variable_name} at line: {position[0]} column: {position[1]}"
+
+- **`WrongTypeReturnError`**
+  - Tekst: "WrongTypeReturnError: Expected return type {expected}, but got {actual} at line: {position[0]} column: {position[1]}"
+
+- **`FunctionAlreadyDefinedError`**
+  - Tekst: "FunctionAlreadyDefinedError: Function {function_name} is already defined"
+
+- **`FunctionNotDefinedError`**
+  - Tekst: "FunctionNotDefinedError: Function {function_name} is not defined, line: {position[0]} at column: {position[1]}"
+
+- **`ZeroDivisionError`**
+  - Tekst: "ZeroDivisionError: Division by zero is not defined, line: {position[0]} at column: {position[1]}"
+
+- **`MaximumIterationsExceededError`**
+  - Tekst: "Błąd przekroczenia maksymalnej liczby iteracji: Przekroczono maksymalną liczbę iteracji, linia: {position[0]} kolumna: {position[1]}"
+
+- **`MaximumRecursionExceededError`**
+  - Tekst: "Błąd przekroczenia maksymalnej liczby rekursji: Przekroczono maksymalną liczbę rekursji, linia: {position[0]} kolumna: {position[1]}"
+### Wyjątki leksykalne
+
+- **`LexerException`**
+  - Tekst: "LexerException: {message} in line:{line} column:{column}"
+
+- **`CommentTooLongException`**
+  - Tekst: "CommentTooLongException: {message} in line:{line} column:{column}"
+
+- **`StringTooLongException`**
+  - Tekst: "StringTooLongException: {message} in line:{line} column:{column}"
+
+- **`IdentifierTooLongException`**
+  - Tekst: "IdentifierTooLongException: {message} in line:{line} column:{column}"
+
+- **`UnclosedStringException`**
+  - Tekst: "UnclosedStringException: {message} in line:{line} column:{column}"
+
+- **`NumberException`**
+  - Tekst: "TooBigNumberException: {message} in line:{line} column:{column}"
+
+
+### Wyjątki składniowe
+
+- **`ParserException`**
+  - Tekst: (brak specyficznego tekstu dla ogólnego wyjątku)
+
+- **`SyntaxError`**
+  - Tekst: "SyntaxError: Expected {message} in line:{line} column:{column}"
+
+- **`NoSemicolonError`**
+  - Tekst: "NoSemicolonError: Missing semicolon in line:{line} column:{column}"
+
+- **`NoClosingCurlyBracketError`**
+  - Tekst: "NoClosingCurlyBracketError: Missing closing curly bracket in line:{line} column:{column}"
+
+- **`NoClosingBracketError`**
+  - Tekst: "NoClosingBracketError: Missing closing bracket in line:{line} column:{column}"
+
+
 ## Testowanie:
 Do testowania wykorzystam testy jednostkowe oraz integracyjne, napisane przy użyciu
 frameworka pytest.
 Test zostały zamieszczone w katalogu tests, podzielone dla testy dla danego modułu. 
-## Sposób uruchomienia interpreter:
-Uruchamiamy poprzez komendę:
-./main.py <sciezka do pliku>
+
 17. Przykładowy kod
 
 ```
@@ -326,6 +427,124 @@ function int main(){
     return a(100);
 }
 ```
+
+## Typy tokenów
+| Typ Tokena            | Opis                          |
+|-----------------------|-------------------------------|
+| `ID`                  | Identyfikator                 |
+| `FUNCTION`            | Słowo kluczowe funkcji        |
+| `INT_KEYWORD`         | Słowo kluczowe int            |
+| `FLOAT_KEYWORD`       | Słowo kluczowe float          |
+| `STRING_KEYWORD`      | Słowo kluczowe string         |
+| `BOOL_KEYWORD`        | Słowo kluczowe bool           |
+| `INT_VALUE`           | Wartość typu int              |
+| `FLOAT_VALUE`         | Wartość typu float            |
+| `STRING_VALUE`        | Wartość typu string           |
+| `BOOL_VALUE`          | Wartość typu bool             |
+| `PAIR`                | Słowo kluczowe pair           |
+| `LIST`                | Słowo kluczowe list           |
+| `DICT`                | Słowo kluczowe dict           |
+| `LENGTH`              | Słowo kluczowe length         |
+| `DELETE`              | Słowo kluczowe delete         |
+| `GET`                 | Słowo kluczowe get            |
+| `CONTAINS`            | Słowo kluczowe contains       |
+| `TYPE`                | Słowo kluczowe type           |
+| `AT`                  | Słowo kluczowe at             |
+| `APPEND`              | Słowo kluczowe append         |
+| `REMOVE`              | Słowo kluczowe remove         |
+| `FIRST`               | Słowo kluczowe first          |
+| `SECOND`              | Słowo kluczowe second         |
+| `OR_SIGN`             | Znak or (`||`)                |
+| `AND_SIGN`            | Znak and (`&&`)               |
+| `LESS_SIGN`           | Znak mniejszości (`<`)        |
+| `LESS_OR_EQUAL_SIGN`  | Znak mniejszy lub równy (`<=`)| 
+| `GREATER_SIGN`        | Znak większości (`>`)         |
+| `GREATER_OR_EQUAL_SIGN`| Znak większy lub równy (`>=`)|
+| `EQUAL_SIGN`          | Znak równości (`==`)          |
+| `NOT_EQUAL_SIGN`      | Znak nierówności (`!=`)       |
+| `NEGATION_SIGN`       | Znak negacji (`!`)            |
+| `ASSIGN`              | Znak przypisania (`=`)        |
+| `LEFT_BRACKET`        | Lewy nawias okrągły (`(`)     |
+| `RIGHT_BRACKET`       | Prawy nawias okrągły (`)`)    |
+| `LEFT_CURLY_BRACKET`  | Lewy nawias klamrowy (`{`)    |
+| `RIGHT_CURLY_BRACKET` | Prawy nawias klamrowy (`}`)   |
+| `LEFT_SQUARE_BRACKET` | Lewy nawias kwadratowy (`[`)  |
+| `RIGHT_SQUARE_BRACKET`| Prawy nawias kwadratowy (`]`) |
+| `ADD_SIGN`            | Znak dodawania (`+`)          |
+| `SUB_SIGN`            | Znak odejmowania (`-`)        |
+| `MULTIPLY_SIGN`       | Znak mnożenia (`*`)           |
+| `DIVIDE_SIGN`         | Znak dzielenia (`/`)          |
+| `FOR`                 | Słowo kluczowe for            |
+| `WHILE`               | Słowo kluczowe while          |
+| `IF`                  | Słowo kluczowe if             |
+| `ELSE`                | Słowo kluczowe else           |
+| `RETURN`              | Słowo kluczowe return         |
+| `KEY`                 | Słowo kluczowe key            |
+| `FROM`                | Słowo kluczowe from           |
+| `IN`                  | Słowo kluczowe in             |
+| `WHERE`               | Słowo kluczowe where          |
+| `SELECT`              | Słowo kluczowe select         |
+| `ORDER_BY`            | Słowo kluczowe order by       |
+| `TRUE_VALUE`          | Wartość true                  |
+| `FALSE_VALUE`         | Wartość false                 |
+| `SEMICOLON`           | Średnik (`;`)                 |
+| `COLON`               | Dwukropek (`:`)               |
+| `COMMA`               | Przecinek (`,`)               |
+| `DOT`                 | Kropka (`.`)                  |
+| `COMMENT`             | Komentarz                     |
+| `EOF`                 | Koniec pliku                  |
+
+## Węzły ast
+
+| Typ węzła                 | Opis                                                                                           |
+|---------------------------|------------------------------------------------------------------------------------------------|
+| `Program`                 | Reprezentuje cały program, składający się z listy funkcji.                                      |
+| `Variable`                | Reprezentuje zmienną z przypisaną nazwą.                                                        |
+| `StatementBlock`          | Reprezentuje blok instrukcji.                                                                  |
+| `SingleStatement`         | Reprezentuje pojedynczą instrukcję.                                                            |
+| `BoolValue`               | Reprezentuje wartość logiczną (`True` lub `False`).                                            |
+| `IntValue`                | Reprezentuje wartość całkowitą.                                                                |
+| `FloatValue`              | Reprezentuje wartość zmiennoprzecinkową.                                                       |
+| `StringValue`             | Reprezentuje wartość tekstową (ciąg znaków).                                                   |
+| `Identifier`              | Reprezentuje identyfikator (nazwę zmiennej, funkcji, etc.).                                    |
+| `Expression`              | Reprezentuje wyrażenie z lewym i prawym operatorem oraz operacją.                              |
+| `FunctionBody`            | Reprezentuje ciało funkcji, składające się z treści oraz instrukcji `return`.                  |
+| `FunctionCall`            | Reprezentuje wywołanie funkcji z listą argumentów.                                             |
+| `MethodCall`              | Reprezentuje wywołanie metody z listą argumentów.                                              |
+| `FunctionDefinition`      | Reprezentuje definicję funkcji, w tym jej typ zwracany, identyfikator, argumenty oraz ciało.   |
+| `IfStatement`             | Reprezentuje instrukcję warunkową `if`, zawierającą warunek oraz bloki instrukcji dla prawdy i fałszu. |
+| `Body`                    | Reprezentuje ogólny blok zawierający treść.                                                    |
+| `ForStatement`            | Reprezentuje pętlę `for` z typem, identyfikatorem, kolekcją oraz ciałem pętli.                |
+| `ForSortedStatement`      | Reprezentuje pętlę `for`, która iteruje po posortowanej kolekcji, z dodatkowym identyfikatorem klucza. |
+| `WhileStatement`          | Reprezentuje pętlę `while` z warunkiem oraz ciałem pętli.                                      |
+| `LINQ`                    | Reprezentuje zapytanie LINQ z instrukcjami `from`, `where`, `select` i `orderby`.              |
+| `AndExpression`           | Reprezentuje wyrażenie logiczne AND.                                                           |
+| `OrExpression`            | Reprezentuje wyrażenie logiczne OR.                                                            |
+| `AddExpression`           | Reprezentuje wyrażenie dodawania.                                                              |
+| `SubExpression`           | Reprezentuje wyrażenie odejmowania.                                                            |
+| `MultiplyExpression`      | Reprezentuje wyrażenie mnożenia.                                                               |
+| `DivisionExpression`      | Reprezentuje wyrażenie dzielenia.                                                              |
+| `LessThanExpression`      | Reprezentuje wyrażenie mniejsze niż.                                                           |
+| `LessThanOrEqualExpression` | Reprezentuje wyrażenie mniejsze lub równe.                                                 |
+| `GreaterThanExpression`   | Reprezentuje wyrażenie większe niż.                                                            |
+| `GreaterThanOrEqualExpression` | Reprezentuje wyrażenie większe lub równe.                                               |
+| `EqualExpression`         | Reprezentuje wyrażenie równości.                                                              |
+| `NotEqualExpression`      | Reprezentuje wyrażenie nierówności.                                                           |
+| `Assignment`              | Reprezentuje przypisanie wartości do zmiennej.                                                |
+| `Arguments`               | Reprezentuje listę argumentów przekazywanych do funkcji.                                       |
+| `ReturnStatement`         | Reprezentuje instrukcję zwracania wartości z funkcji.                                          |
+| `InitStatement`           | Reprezentuje inicjalizację zmiennej z przypisanym typem i wartością początkową.               |
+| `Declaration`             | Reprezentuje deklarację zmiennej z przypisanym typem.                                         |
+| `ListType`                | Reprezentuje typ listy z określonym typem elementów.                                           |
+| `PairType`                | Reprezentuje typ pary z określonymi typami elementów.                                          |
+| `DictType`                | Reprezentuje typ słownika z określonymi typami kluczy i wartości.                              |
+| `IntType`                 | Reprezentuje typ całkowity.                                                                    |
+| `StringType`              | Reprezentuje typ tekstowy.                                                                     |
+| `FloatType`               | Reprezentuje typ zmiennoprzecinkowy.                                                           |
+| `BoolType`                | Reprezentuje typ logiczny.                                                                     |
+| `List`                    | Reprezentuje listę elementów.                                                                  |
+| `Pair`                    | Reprezentuje parę elementów.                                                                   |
+
 
 ## Gramatyka
 ```
@@ -440,6 +659,6 @@ non_zero_digit 		= '1' | '2' | '3' | '4' | '5' | '6'| '7' | '8' | '9'
 
 semicolon_sign		= ";"
 backslash_sign		= "/"
-comment_start		= "//"
+comment_start		= "#"
 ```
 
