@@ -18,6 +18,10 @@ class Reader:
             self.current_position = self.next_position
             self.next_position = (self.current_position[0] + 1, 1)
 
+        elif next_char == "#":
+            while self.current_char != "\n":
+                self.next()
+
         else:
             self.current_char = next_char
             self.current_position = self.next_position

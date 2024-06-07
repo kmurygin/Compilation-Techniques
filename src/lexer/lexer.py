@@ -161,8 +161,9 @@ class Lexer:
             elif character == "=":
                 operator += character
                 return Token(self.token_dictionary_operators[operator], operator, self.current_position)
-        if character in ['|','&']:
+        if character in ['|', '&']:
             token = self.build_logical_operator(character)
+            self.get_next_char()
             if token:
                 return token
         return None
@@ -248,7 +249,11 @@ class Lexer:
         if text == "":
             return None
         elif text in ("true", "false"):
-            return Token(TokenType.BOOL_VALUE, text, self.current_position)
+            match text:
+                case "true":
+                    return Token(TokenType.BOOL_VALUE, True, self.current_position)
+                case "false":
+                    return Token(TokenType.BOOL_VALUE, False, self.current_position)
         elif text in self.token_dictionary.keys():
             return Token(self.token_dictionary[text], text, self.current_position)
         return Token(TokenType.ID, text, self.current_position)
